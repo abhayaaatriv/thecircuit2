@@ -344,14 +344,15 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
 .otp-box{width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;font-family:var(--font-mono);border:2px solid rgba(255,255,255,0.15);border-radius:10px;outline:none;transition:all 0.2s;background:rgba(255,255,255,0.06);color:#fff}
 .otp-box:focus{border-color:var(--saffron);background:rgba(255,255,255,0.1)}
 
-/* CHAT FAB */
-.chat-fab{position:fixed;bottom:32px;right:32px;z-index:9000;display:flex;align-items:center;gap:10px;background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px 20px;border-radius:50px;font-size:14px;font-weight:600;font-family:var(--font-body);cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,0.4);transition:all 0.25s}
-.chat-fab:hover{background:var(--violet);transform:translateY(-3px);box-shadow:0 16px 40px rgba(92,78,232,0.4)}
-.chat-fab-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease infinite}
-
 /* LIVE CHAT ROOM */
 #chatRoomModal{display:none;position:fixed;inset:0;z-index:1200;background:rgba(5,5,5,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center}
 .chat-room-inner{background:#111;border:1px solid rgba(255,255,255,0.1);width:100%;max-width:480px;border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.5);display:flex;flex-direction:column;max-height:85vh}
+.message-thread{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.message-thread-main{flex:1;min-width:220px}
+.message-thread-title{font-size:14px;font-weight:700;color:#fff}
+.message-thread-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;line-height:1.6}
+.message-thread-preview{font-size:12px;color:rgba(255,255,255,0.45);margin-top:8px}
+.chat-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:10px;font-weight:700}
 
 .fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.5s ease,transform 0.5s ease}
 .fade-in.visible{opacity:1;transform:translateY(0)}
@@ -512,9 +513,6 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
     </div>
   </div>
 </section>
-
-<!-- CHAT FAB -->
-<button class="chat-fab" onclick="openChatRoom('Support')"><span class="chat-fab-dot"></span>💬 Live Chat</button>
 
 <!-- ==================== MODALS ==================== -->
 
@@ -700,6 +698,7 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
         <div class="org-nav-item" onclick="switchOrgPage('tinder',this)"> Vendor Swipe</div>
         <div class="org-nav-item" onclick="switchOrgPage('applications',this)"> Applications</div>
         <div class="org-nav-item" onclick="switchOrgPage('matches',this)"> Matches</div>
+        <div class="org-nav-item" onclick="switchOrgPage('messages',this)"> Messages <span class="chat-badge" id="orgUnreadBadge" style="display:none">0</span></div>
         <div class="org-nav-item" onclick="switchOrgPage('profile',this)">👤 Profile</div>
       </nav>
       <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
@@ -759,6 +758,11 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
         <div id="orgPageAllMatchesList" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
       </div>
 
+      <div id="orgPage_messages" style="display:none">
+        <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Vendor Chats</h2>
+        <div id="orgPageMessagesList"></div>
+      </div>
+
       <div id="orgPage_profile" style="display:none">
          <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Organiser Profile</h2>
          <div id="orgPageProfileContent" style="background:rgba(255,255,255,0.03);border-radius:24px;padding:32px;border:1px solid rgba(255,255,255,0.08);max-width:700px">
@@ -786,6 +790,7 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
         <div class="vendor-nav-item active" data-page="overview" onclick="switchVendorPage('overview',this)"> Overview</div>
         <div class="vendor-nav-item" data-page="events" onclick="switchVendorPage('events',this)"> Nearby Events</div>
         <div class="vendor-nav-item" data-page="applications" onclick="switchVendorPage('applications',this)"> Applications</div>
+        <div class="vendor-nav-item" data-page="messages" onclick="switchVendorPage('messages',this)"> Messages <span class="chat-badge" id="vendorUnreadBadge" style="display:none">0</span></div>
         <div class="vendor-nav-item" data-page="profile" onclick="switchVendorPage('profile',this)">👤 Profile</div>
       </nav>
       <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
@@ -838,6 +843,11 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
         <div id="vendorPageAppsList"></div>
       </div>
 
+      <div id="vendorPage_messages" style="display:none">
+        <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Organiser Chats</h2>
+        <div id="vendorPageMessagesList"></div>
+      </div>
+
       <div id="vendorPage_profile" style="display:none">
         <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Vendor Profile</h2>
         <div style="background:rgba(255,255,255,0.03);border-radius:24px;padding:32px;border:1px solid rgba(255,255,255,0.08);max-width:760px">
@@ -886,7 +896,10 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
 <div id="chatRoomModal" onclick="if(event.target===this)closeChatRoom()">
 <div class="chat-room-inner">
   <div style="padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:14px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px">💬 <span id="chatRoomTitle">Chat</span><span id="chatRoomStatus" style="font-size:10px;background:rgba(26,122,74,0.2);color:var(--green);padding:2px 9px;border-radius:50px;font-weight:600">● Live</span></div>
+    <div>
+      <div style="font-size:14px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px">💬 <span id="chatRoomTitle">Chat</span><span id="chatRoomStatus" style="font-size:10px;background:rgba(26,122,74,0.2);color:var(--green);padding:2px 9px;border-radius:50px;font-weight:600">● Live</span></div>
+      <div id="chatRoomMeta" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px">Dashboard chat</div>
+    </div>
     <button onclick="closeChatRoom()" style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px">×</button>
   </div>
   <div id="chatRoomMsgs" style="flex:1;overflow-y:auto;padding:16px;min-height:280px;max-height:380px;display:flex;flex-direction:column;gap:10px"></div>
@@ -999,6 +1012,23 @@ function fetchLocation(){
 // ===== REAL-TIME EVENTS (Overpass + District.in scrape via Claude) =====
 let vendorProfile=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
 let latestNearbyEvents=[];
+const chatStorageKey='tc_chat_threads';
+let portalChatChannel=null;
+let activePortalRole='guest';
+let activeChatThreadId=null;
+
+function slugify(value=''){
+  return value.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'thread';
+}
+
+function escapeHtml(value=''){
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 
 function getVendorDefaults(){
   return {
@@ -1025,16 +1055,27 @@ function ensureVendorProfile(seed={}){
   return syncVendorProfile({...stored,...seed});
 }
 
+function hasVendorAccount(profile={}){
+  return Boolean(profile.authComplete||profile.verified||profile.hasCompletedOnboarding);
+}
+
+function needsVendorKyc(profile={}){
+  return Boolean(hasVendorAccount(profile)&&!profile.verified);
+}
+
 function updateVendorNavCta(){
   const btn=document.getElementById('navMainBtn');
   if(!btn) return;
   const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
-  const hasProfile=Boolean(stored.name||stored.desc||stored.category||stored.verified);
-  if(hasProfile){
+  if(stored.verified||stored.hasCompletedOnboarding){
     const firstName=(stored.name||'Vendor').split(' ')[0];
-    btn.textContent=stored.verified?`Hi, ${firstName} ✓`:'Vendor Dashboard ↗';
-    btn.style.background=stored.verified?'var(--green)':'var(--accent)';
+    btn.textContent=`Hi, ${firstName} ✓`;
+    btn.style.background='var(--green)';
     btn.onclick=()=>openVendorPortal('overview');
+  }else if(needsVendorKyc(stored)){
+    btn.textContent='Complete Vendor Setup ↗';
+    btn.style.background='var(--accent)';
+    btn.onclick=()=>openKYC();
   }else{
     btn.textContent='List My Stall ↗';
     btn.style.background='var(--accent)';
@@ -1058,8 +1099,12 @@ function startAuthFlow(role='vendor'){
 
 function enterVendorFlow(page='overview'){
   const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
-  if(stored.name||stored.desc||stored.category||stored.verified){
+  if(stored.verified||stored.hasCompletedOnboarding){
     openVendorPortal(page);
+    return;
+  }
+  if(needsVendorKyc(stored)){
+    openKYC();
     return;
   }
   startAuthFlow('vendor');
@@ -1090,6 +1135,160 @@ function scoreEventForVendor(ev){
 
 function scoreEventsForVendor(events){
   return events.map(ev=>({...ev,matchScore:scoreEventForVendor(ev)})).sort((a,b)=>b.matchScore-a.matchScore);
+}
+
+function getChatThreads(){
+  try{return JSON.parse(localStorage.getItem(chatStorageKey)||'[]');}catch(e){return []}
+}
+
+function saveChatThreads(threads){
+  localStorage.setItem(chatStorageKey,JSON.stringify(threads));
+  try{portalChatChannel?.postMessage({type:'threads-updated'});}catch(e){}
+}
+
+function getCurrentOrganiserProfile(){
+  return JSON.parse(sessionStorage.getItem('tc_orgProfile')||'{}');
+}
+
+function getCurrentOrganiserName(){
+  return getCurrentOrganiserProfile().name||'Organiser';
+}
+
+function getCurrentVendorName(){
+  return JSON.parse(sessionStorage.getItem('tc_profile')||'{}').name||'Vendor';
+}
+
+function ensureChatThread({threadId,applicationId=null,vendorName,organiserName,eventName='Event',source='approved'}){
+  if(!vendorName||!organiserName) return null;
+  const threads=getChatThreads();
+  let thread=threads.find(t=>t.id===threadId);
+  let changed=false;
+  if(!thread){
+    thread={
+      id:threadId,
+      applicationId,
+      vendorName,
+      organiserName,
+      eventName,
+      source,
+      messages:[],
+      unread:{vendor:0,organiser:0},
+      updatedAt:new Date().toISOString()
+    };
+    threads.push(thread);
+    changed=true;
+  }else{
+    if((applicationId??thread.applicationId)!==thread.applicationId){thread.applicationId=applicationId??thread.applicationId;changed=true;}
+    if(thread.vendorName!==vendorName){thread.vendorName=vendorName;changed=true;}
+    if(thread.organiserName!==organiserName){thread.organiserName=organiserName;changed=true;}
+    if((eventName||thread.eventName)!==thread.eventName){thread.eventName=eventName||thread.eventName;changed=true;}
+    if((source||thread.source)!==thread.source){thread.source=source||thread.source;changed=true;}
+  }
+  if(changed) saveChatThreads(threads);
+  return thread;
+}
+
+function ensureChatThreadForApplication(app){
+  if(!app||app.status!=='approved') return null;
+  return ensureChatThread({
+    threadId:`app_${app.id}`,
+    applicationId:app.id,
+    vendorName:app.vendorName,
+    organiserName:getCurrentOrganiserName(),
+    eventName:app.eventName,
+    source:'approved'
+  });
+}
+
+function hydrateApprovedChatThreads(){
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  apps.filter(app=>app.status==='approved').forEach(app=>ensureChatThreadForApplication(app));
+}
+
+function getThreadUnreadCount(threadId,role){
+  const thread=getChatThreads().find(t=>t.id===threadId);
+  return thread?.unread?.[role]||0;
+}
+
+function getRoleThreads(role){
+  hydrateApprovedChatThreads();
+  const threads=getChatThreads();
+  const organiserName=getCurrentOrganiserName();
+  const vendorName=getCurrentVendorName();
+  return threads
+    .filter(thread=>role==='organiser'?thread.organiserName===organiserName:thread.vendorName===vendorName)
+    .sort((a,b)=>new Date(b.updatedAt||0)-new Date(a.updatedAt||0));
+}
+
+function getPartnerName(thread,role){
+  return role==='organiser'?thread.vendorName:thread.organiserName;
+}
+
+function markThreadRead(threadId,role){
+  const threads=getChatThreads();
+  const thread=threads.find(t=>t.id===threadId);
+  if(!thread) return;
+  thread.unread={...thread.unread,[role]:0};
+  saveChatThreads(threads);
+}
+
+function updateChatBadges(){
+  const orgUnread=getRoleThreads('organiser').reduce((sum,thread)=>sum+(thread.unread?.organiser||0),0);
+  const vendorUnread=getRoleThreads('vendor').reduce((sum,thread)=>sum+(thread.unread?.vendor||0),0);
+  const orgBadge=document.getElementById('orgUnreadBadge');
+  const vendorBadge=document.getElementById('vendorUnreadBadge');
+  if(orgBadge){orgBadge.style.display=orgUnread?'inline-flex':'none';orgBadge.textContent=orgUnread;}
+  if(vendorBadge){vendorBadge.style.display=vendorUnread?'inline-flex':'none';vendorBadge.textContent=vendorUnread;}
+}
+
+function renderMessageThreadList(role,containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  const threads=getRoleThreads(role);
+  if(!threads.length){
+    el.innerHTML=`<div style="text-align:center;color:rgba(255,255,255,0.35);padding:50px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px;font-size:14px">Chat unlocks once an organiser approves a vendor application or starts a matched conversation.</div>`;
+    return;
+  }
+  el.innerHTML=threads.map(thread=>{
+    const unread=thread.unread?.[role]||0;
+    const last=thread.messages[thread.messages.length-1];
+    const preview=last?`${last.fromName}: ${last.text}`:'Chat is ready to start.';
+    return `<div class="message-thread">
+      <div class="message-thread-main">
+        <div class="message-thread-title">${escapeHtml(getPartnerName(thread,role))}${unread?` <span class="chat-badge">${unread}</span>`:''}</div>
+        <div class="message-thread-sub">${escapeHtml(thread.eventName||'Event')} · ${role==='organiser'?'Vendor chat unlocked':'Organiser chat unlocked'}</div>
+        <div class="message-thread-preview">${escapeHtml(preview)}</div>
+      </div>
+      <button onclick="openChatThread('${thread.id}')" style="background:rgba(92,78,232,0.18);color:#c7c0ff;border:none;padding:10px 16px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer">${unread?'Open New Message':'Open Chat'}</button>
+    </div>`;
+  }).join('');
+}
+
+function renderOrganiserMessages(){
+  renderMessageThreadList('organiser','orgPageMessagesList');
+}
+
+function renderVendorMessages(){
+  renderMessageThreadList('vendor','vendorPageMessagesList');
+}
+
+function syncPortalChatUi(){
+  updateChatBadges();
+  renderOrganiserMessages();
+  renderVendorMessages();
+  if(activePortalRole==='organiser') renderAppsList();
+  if(activePortalRole==='vendor') renderVendorApplications();
+  if(activeChatThreadId) renderActiveChatThread();
+}
+
+function initPortalChatSync(){
+  try{
+    portalChatChannel=new BroadcastChannel('tc_portal_dashboard_chat');
+    portalChatChannel.onmessage=()=>syncPortalChatUi();
+  }catch(e){}
+  window.addEventListener('storage',e=>{
+    if(e.key===chatStorageKey) syncPortalChatUi();
+  });
 }
 
 async function fetchNearbyEvents(lat,lng){
@@ -1592,7 +1791,7 @@ function buildFinalSummary(){
       <span style="color:var(--green)">Documents: ${Object.keys(docsUploaded).length} uploaded</span> · <span style="color:var(--green)">Face: ${kycData.faceVerified?'Verified':'Skipped'}</span>
     </div>
   `;
-  syncVendorProfile({...vendorProfile,verified:true});
+  syncVendorProfile({...vendorProfile,verified:true,authComplete:true,hasCompletedOnboarding:true});
   showToast('🎉 eKYC complete! Trust score: 94/100','success');
 }
 
@@ -1779,6 +1978,7 @@ function openOrganiserPortal(){
     startOrganiserOnboarding();
     return;
   }
+  activePortalRole='organiser';
   document.getElementById('organiserPage').style.display='block';
   document.body.style.overflow='hidden';
   updateOrgStats();
@@ -1786,22 +1986,26 @@ function openOrganiserPortal(){
   renderTinderDeck();
   renderMatches();
   renderAppsList();
+  renderOrganiserMessages();
+  updateChatBadges();
   renderOrgPageProfile();
 }
 
 function closeOrganiserPortal(){
   document.getElementById('organiserPage').style.display='none';
+  activePortalRole=document.getElementById('vendorPage').style.display==='block'?'vendor':'guest';
   document.body.style.overflow='';
 }
 
 function switchOrgPage(page, el){
   document.querySelectorAll('.org-nav-item').forEach(n=>n.classList.remove('active'));
   el.classList.add('active');
-  ['overview','tinder','applications','matches','profile'].forEach(p=>{
+  ['overview','tinder','applications','matches','messages','profile'].forEach(p=>{
     const section = document.getElementById('orgPage_'+p);
     if(section) section.style.display = p === page ? 'block' : 'none';
   });
   if(page === 'tinder') setTimeout(renderTinderDeck, 50);
+  if(page === 'messages') renderOrganiserMessages();
 }
 
 function renderOrgPageProfile(){
@@ -1831,15 +2035,25 @@ function renderAppsList(){
   const el=document.getElementById('orgPageAppsList');
   if(!el) return;
   if(apps.length===0){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:14px">No applications yet. Share your event link!</div>';return;}
-  el.innerHTML=apps.map(a=>`
-    <div class="app-item ${a.status}">
+  el.innerHTML=apps.map(a=>{
+    const thread=a.status==='approved'?ensureChatThreadForApplication(a):null;
+    const unread=thread?thread.unread?.organiser||0:0;
+    const actionHtml=
+      a.status==='pending'
+        ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="changeAppStatus(${a.id},'approved')" style="background:rgba(26,122,74,0.2);color:var(--green);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✓ Approve</button>
+            <button onclick="changeAppStatus(${a.id},'rejected')" style="background:rgba(200,16,46,0.15);color:var(--accent);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✕ Reject</button>
+          </div>`
+        : a.status==='approved'
+          ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="openApplicationChat(${a.id})" style="background:rgba(92,78,232,0.2);color:#c7c0ff;border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">💬 Chat${unread?` (${unread})`:''}</button>
+            </div>`
+          : `<div style="font-size:11px;color:rgba(255,255,255,0.35)">Chat unlocks after approval.</div>`;
+    return `<div class="app-item ${a.status}">
       <div><div style="font-size:14px;font-weight:600;color:#fff">${a.vendorName}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">${a.eventName} · ${new Date(a.appliedAt).toLocaleDateString()}</div><span class="status-badge sb-${a.status}">${a.status.toUpperCase()}</span></div>
-      ${a.status==='pending'?`<div style="display:flex;gap:8px">
-        <button onclick="changeAppStatus(${a.id},'approved')" style="background:rgba(26,122,74,0.2);color:var(--green);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✓ Approve</button>
-        <button onclick="changeAppStatus(${a.id},'rejected')" style="background:rgba(200,16,46,0.15);color:var(--accent);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✕ Reject</button>
-        <button onclick="openChatRoom('${a.vendorName}')" style="background:rgba(92,78,232,0.2);color:#9B8EF0;border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">💬 Chat</button>
-      </div>`:`<button onclick="openChatRoom('${a.vendorName}')" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">💬 Chat</button>`}
-    </div>`).join('');
+      ${actionHtml}
+    </div>`;
+  }).join('');
 }
 
 // Redirect create-event submittion
@@ -1872,12 +2086,15 @@ function buildOrgAiRecs(){
 function changeAppStatus(id,status){
   const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]').map(a=>a.id===id?{...a,status}:a);
   sessionStorage.setItem('tc_applications',JSON.stringify(apps));
+  const approvedApp=apps.find(a=>a.id===id&&a.status==='approved');
+  if(approvedApp) ensureChatThreadForApplication(approvedApp);
   renderAppsList();updateOrgStats();
   if(document.getElementById('vendorPage').style.display==='block'){
     renderVendorApplications();
     renderVendorOverview();
   }
-  showToast(status==='approved'?'✅ Vendor approved!':'❌ Vendor rejected.','success');
+  syncPortalChatUi();
+  showToast(status==='approved'?'✅ Vendor approved! Chat unlocked.':'❌ Vendor rejected.','success');
 }
 
 // ===== VENDOR PORTAL LOGIC =====
@@ -1925,17 +2142,21 @@ function viewVendorEventDetails(name){
 
 function openVendorPortal(page='overview'){
   ensureVendorProfile();
+  activePortalRole='vendor';
   document.getElementById('vendorPage').style.display='block';
   document.body.style.overflow='hidden';
   renderVendorOverview();
   renderVendorEventFeed();
   renderVendorApplications();
+  renderVendorMessages();
+  updateChatBadges();
   renderVendorPageProfile();
   switchVendorPage(page);
 }
 
 function closeVendorPortal(){
   document.getElementById('vendorPage').style.display='none';
+  activePortalRole=document.getElementById('organiserPage').style.display==='block'?'organiser':'guest';
   document.body.style.overflow='';
 }
 
@@ -1943,12 +2164,13 @@ function switchVendorPage(page,el){
   const activeEl=el||document.querySelector(`.vendor-nav-item[data-page="${page}"]`);
   document.querySelectorAll('.vendor-nav-item').forEach(n=>n.classList.remove('active'));
   if(activeEl) activeEl.classList.add('active');
-  ['overview','events','applications','profile'].forEach(section=>{
+  ['overview','events','applications','messages','profile'].forEach(section=>{
     const el=document.getElementById('vendorPage_'+section);
     if(el) el.style.display=section===page?'block':'none';
   });
   if(page==='events') renderVendorEventFeed();
   if(page==='applications') renderVendorApplications();
+  if(page==='messages') renderVendorMessages();
   if(page==='profile') renderVendorPageProfile();
 }
 
@@ -2013,18 +2235,24 @@ function renderVendorApplications(){
     el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.35);padding:50px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px;font-size:14px">No event applications yet. Head to Nearby Events to start applying.</div>';
     return;
   }
-  el.innerHTML=apps.slice().reverse().map(app=>`
-    <div class="app-item ${app.status}">
+  el.innerHTML=apps.slice().reverse().map(app=>{
+    const thread=app.status==='approved'?ensureChatThreadForApplication(app):null;
+    const unread=thread?thread.unread?.vendor||0:0;
+    const chatHtml=app.status==='approved'
+      ? `<button onclick="openApplicationChat(${app.id})" style="background:rgba(92,78,232,0.18);color:#c7c0ff;border:none;padding:8px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">Chat with Organiser${unread?` (${unread})`:''}</button>`
+      : `<div style="font-size:11px;color:rgba(255,255,255,0.35)">${app.status==='pending'?'Chat unlocks once organiser approves.':'Chat unavailable for rejected applications.'}</div>`;
+    return `<div class="app-item ${app.status}">
       <div>
         <div style="font-size:14px;font-weight:600;color:#fff">${app.eventName}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.35)">Applied ${new Date(app.appliedAt).toLocaleDateString()} · Vendor: ${app.vendorName}</div>
         <span class="status-badge sb-${app.status}">${app.status.toUpperCase()}</span>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button onclick="viewVendorEventDetails('${app.eventName.replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:8px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">View Details</button>
-        <button onclick="openChatRoom('Event Desk')" style="background:rgba(92,78,232,0.18);color:#c7c0ff;border:none;padding:8px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">Chat</button>
+        ${chatHtml}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderVendorPageProfile(){
@@ -2064,6 +2292,7 @@ function openVendorKyc(){
 
 // ===== VENDOR DETAIL =====
 function openVendorDetail(name,catCity,emoji,events,rating,accept,bg,vibesStr){
+  const chatBtn=document.getElementById('vModalChatBtn');
   document.getElementById('vModalName').textContent=name;
   document.getElementById('vModalBanner').style.background=`linear-gradient(135deg,${bg})`;
   document.getElementById('vModalBanner').textContent=emoji;
@@ -2083,65 +2312,124 @@ function openVendorDetail(name,catCity,emoji,events,rating,accept,bg,vibesStr){
         '🥇 NH7 Weekender — 92% match<br>🥈 Kala Ghoda Arts — 86% match<br>🥉 College Fest Circuit — 74% match':
         '🥇 Craft Bazaar Weekend — 91% match<br>🥈 Dilli Haat — 82% match<br>🥉 Kala Ghoda Arts — 75% match'}
     </div>`;
-  document.getElementById('vModalChatBtn').onclick=()=>{closeModal('vendorModal');openChatRoom(name)};
+  if(document.getElementById('organiserPage').style.display==='block'){
+    chatBtn.style.display='block';
+    chatBtn.textContent='💬 Open Chat from Dashboard →';
+    chatBtn.onclick=()=>{closeModal('vendorModal');openChatRoom(name)};
+  }else{
+    chatBtn.style.display='none';
+  }
   openModal('vendorModal');
 }
 
 // ===== LIVE CHAT ROOM =====
-let chatRoom=null,chatBcast=null,chatRoomName='';
+function getActiveRoleName(){
+  return activePortalRole==='organiser'?getCurrentOrganiserName():getCurrentVendorName();
+}
+
+function getOtherRole(role){
+  return role==='organiser'?'vendor':'organiser';
+}
+
+function restoreBodyAfterChat(){
+  const vendorOpen=document.getElementById('vendorPage').style.display==='block';
+  const organiserOpen=document.getElementById('organiserPage').style.display==='block';
+  document.body.style.overflow=vendorOpen||organiserOpen?'hidden':'';
+}
+
+function openApplicationChat(appId){
+  const app=JSON.parse(sessionStorage.getItem('tc_applications')||'[]').find(item=>item.id===appId);
+  if(!app||app.status!=='approved'){
+    showToast('Chat unlocks once the application is approved.','info');
+    return;
+  }
+  const thread=ensureChatThreadForApplication(app);
+  if(thread) openChatThread(thread.id);
+}
+
 function openChatRoom(name){
-  chatRoomName=name;
-  document.getElementById('chatRoomTitle').textContent=name;
-  document.getElementById('chatRoomMsgs').innerHTML='';
+  const vendorOpen=document.getElementById('vendorPage').style.display==='block';
+  const organiserOpen=document.getElementById('organiserPage').style.display==='block';
+  if(!vendorOpen&&!organiserOpen){
+    showToast('Live chat is available only inside organiser and vendor dashboards.','info');
+    return;
+  }
+  if(activePortalRole==='organiser'){
+    const thread=ensureChatThread({
+      threadId:`match_${slugify(getCurrentOrganiserName())}_${slugify(name)}`,
+      vendorName:name,
+      organiserName:getCurrentOrganiserName(),
+      eventName:getCurrentOrganiserProfile().eventName||'Matched Vendor',
+      source:'match'
+    });
+    if(thread) openChatThread(thread.id);
+    return;
+  }
+  const existing=getRoleThreads('vendor').find(thread=>thread.organiserName===name);
+  if(existing){
+    openChatThread(existing.id);
+    return;
+  }
+  showToast('Open an approved organiser conversation from your Applications or Messages tab.','info');
+}
+
+function openChatThread(threadId){
+  activeChatThreadId=threadId;
+  markThreadRead(threadId,activePortalRole);
+  renderActiveChatThread();
   document.getElementById('chatRoomModal').style.display='flex';
   document.body.style.overflow='hidden';
-  // Init WebSocket
-  try{
-    chatRoom=new WebSocket('wss://echo.websocket.events');
-    chatRoom.onopen=()=>{document.getElementById('chatRoomStatus').textContent='● Connected'};
-    chatRoom.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.room===chatRoomName&&m.from!=='me') appendRoomMsg(m.text,false,m.from);}catch(ex){}};
-  }catch(ex){}
-  try{chatBcast=new BroadcastChannel('tc_chat_'+chatRoomName);chatBcast.onmessage=e=>{appendRoomMsg(e.data.text,false,e.data.from)};}catch(ex){}
-  // Welcome
-  appendRoomMsg(`You're now chatting with ${name}. Ask about stall availability, pricing, or placement.`,false,'TheCircuit Bot');
-  // Simulate reply
-  setTimeout(()=>{
-    showRoomTyping();
-    setTimeout(()=>{
-      hideRoomTyping();
-      const rs=['Hi! Thanks for reaching out. Which event are you interested in?','Hello! Happy to discuss details. What type of stall do you need?','Hi! We have a few spots left. What size setup do you need?'];
-      appendRoomMsg(rs[Math.floor(Math.random()*rs.length)],false,name);
-    },2200);
-  },1500);
 }
-function closeChatRoom(){chatRoom?.close();chatBcast?.close();document.getElementById('chatRoomModal').style.display='none';document.body.style.overflow='';}
+
+function renderActiveChatThread(){
+  const thread=getChatThreads().find(t=>t.id===activeChatThreadId);
+  if(!thread) return;
+  const title=getPartnerName(thread,activePortalRole);
+  document.getElementById('chatRoomTitle').textContent=title;
+  document.getElementById('chatRoomMeta').textContent=`${thread.eventName||'Event'} · ${activePortalRole==='organiser'?'Vendor':'Organiser'} chat`;
+  document.getElementById('chatRoomStatus').textContent='● Live';
+  const msgs=document.getElementById('chatRoomMsgs');
+  msgs.innerHTML='';
+  if(!thread.messages.length){
+    msgs.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.35);text-align:center;padding:30px 0">Chat is unlocked. Say hello to start the conversation.</div>';
+    return;
+  }
+  thread.messages.forEach(message=>appendRoomMsg(message.text,message.fromRole===activePortalRole,message.fromName,message.sentAt));
+}
+
+function closeChatRoom(){
+  activeChatThreadId=null;
+  document.getElementById('chatRoomModal').style.display='none';
+  restoreBodyAfterChat();
+}
+
 function sendRoomMsg(){
   const input=document.getElementById('chatRoomIn');
-  const text=input.value.trim();if(!text) return;
+  const text=input.value.trim();
+  if(!text||!activeChatThreadId) return;
+  const threads=getChatThreads();
+  const thread=threads.find(t=>t.id===activeChatThreadId);
+  if(!thread) return;
+  const fromRole=activePortalRole;
+  const fromName=getActiveRoleName();
+  const sentAt=new Date().toISOString();
+  thread.messages.push({id:Date.now(),text,fromRole,fromName,sentAt});
+  thread.updatedAt=sentAt;
+  thread.unread={...thread.unread,[fromRole]:0,[getOtherRole(fromRole)]:(thread.unread?.[getOtherRole(fromRole)]||0)+1};
   input.value='';
-  appendRoomMsg(text,true,'me');
-  try{chatRoom?.send(JSON.stringify({room:chatRoomName,text,from:'me'}));}catch(e){}
-  try{chatBcast?.postMessage({text,from:'me'});}catch(e){}
-  // Auto reply
-  setTimeout(()=>{
-    showRoomTyping();
-    setTimeout(()=>{
-      hideRoomTyping();
-      const rs=['Got it! Let me check stall availability for those dates.','Sure! Our stalls are 10×10 ft. Corner spots available for +₹1,500.','Payment is due 48h after acceptance. GPay/UPI accepted.','You\'ll get SMS confirmation within 24 hours.'];
-      appendRoomMsg(rs[Math.floor(Math.random()*rs.length)],false,chatRoomName);
-    },1200+Math.random()*1500);
-  },600);
+  saveChatThreads(threads);
+  renderActiveChatThread();
+  syncPortalChatUi();
 }
-function appendRoomMsg(text,mine,from){
+
+function appendRoomMsg(text,mine,from,sentAt){
   const msgs=document.getElementById('chatRoomMsgs');
   const d=document.createElement('div');
   d.style.cssText=`display:flex;justify-content:${mine?'flex-end':'flex-start'};margin-bottom:8px`;
-  d.innerHTML=`<div style="max-width:78%;padding:9px 13px;border-radius:${mine?'14px 14px 3px 14px':'14px 14px 14px 3px'};background:${mine?'var(--accent)':'rgba(255,255,255,0.09)'};color:#fff;font-size:13px;line-height:1.5">${!mine?`<div style="font-size:10px;opacity:0.4;margin-bottom:3px">${from}</div>`:''}${text}<div style="font-size:10px;opacity:0.35;margin-top:3px;text-align:right">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>`;
-  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  d.innerHTML=`<div style="max-width:78%;padding:9px 13px;border-radius:${mine?'14px 14px 3px 14px':'14px 14px 14px 3px'};background:${mine?'var(--accent)':'rgba(255,255,255,0.09)'};color:#fff;font-size:13px;line-height:1.5">${!mine?`<div style="font-size:10px;opacity:0.4;margin-bottom:3px">${escapeHtml(from)}</div>`:''}${escapeHtml(text)}<div style="font-size:10px;opacity:0.35;margin-top:3px;text-align:right">${new Date(sentAt||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop=msgs.scrollHeight;
 }
-let roomTypingEl=null;
-function showRoomTyping(){if(roomTypingEl) return;const msgs=document.getElementById('chatRoomMsgs');roomTypingEl=document.createElement('div');roomTypingEl.style.cssText='display:flex;justify-content:flex-start;margin-bottom:8px';roomTypingEl.innerHTML='<div style="padding:9px 13px;border-radius:14px;background:rgba(255,255,255,0.08);display:flex;gap:4px;align-items:center"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';msgs.appendChild(roomTypingEl);msgs.scrollTop=msgs.scrollHeight;}
-function hideRoomTyping(){roomTypingEl?.remove();roomTypingEl=null;}
 
 // ===== PROFILE PAGE =====
 function openProfilePage(){
@@ -2186,9 +2474,19 @@ function verifyAuthOTP(){
   if(code==='123456'){
     document.getElementById('authOtpErr').style.display='none';
     const welcome = authRole === 'organiser' ? 'Organiser Portal' : 'Vendor Dashboard';
+    const storedVendor=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+    const vendorNeedsSetup=!storedVendor.verified&&!storedVendor.hasCompletedOnboarding;
     document.getElementById('authWelcomeName').textContent = `Welcome to your ${welcome}! 🎉`;
-    document.getElementById('authWelcomeDesc').textContent = authRole === 'organiser' ? 'Start listing your event and finding the perfect vendors today.' : 'Open your vendor profile, explore nearby events, and apply from one dashboard.';
-    document.getElementById('authFinalBtn').textContent = authRole === 'organiser' ? 'Go to Organiser Portal →' : 'Open Vendor Dashboard →';
+    document.getElementById('authWelcomeDesc').textContent = authRole === 'organiser'
+      ? 'Start listing your event and finding the perfect vendors today.'
+      : vendorNeedsSetup
+        ? 'Complete your eKYC steps first, then we will open your vendor profile and dashboard.'
+        : 'Open your vendor profile, explore nearby events, and apply from one dashboard.';
+    document.getElementById('authFinalBtn').textContent = authRole === 'organiser'
+      ? 'Go to Organiser Portal →'
+      : vendorNeedsSetup
+        ? 'Start eKYC Verification →'
+        : 'Open Vendor Dashboard →';
     authNext(4);
   }else{
     document.getElementById('authOtpErr').style.display='block';
@@ -2202,18 +2500,25 @@ function authFinalAction(){
   if(authRole === 'organiser'){
     startOrganiserOnboarding();
   } else {
-    ensureVendorProfile({city:userCity});
-    openVendorPortal('profile');
+    const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+    const nextProfile=ensureVendorProfile({...stored,city:stored.city||userCity,authComplete:true});
+    if(nextProfile.verified||nextProfile.hasCompletedOnboarding){
+      openVendorPortal('profile');
+    }else{
+      openKYC();
+    }
   }
 }
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
+  initPortalChatSync();
   fetchLocation();
   // Stats counter
   let c=0;const si=document.getElementById('statEvents');
   setInterval(()=>{if(c<20){c++;si.textContent=(2400+c)+'+'}},150);
   updateVendorNavCta();
+  updateChatBadges();
 });
 </script>
 </body>
