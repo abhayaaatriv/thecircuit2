@@ -85,4 +85,25 @@ app.post('/api/claude', async (req, res) => {
   }
 });
 
+// PYTHON BRAIN PROXY - THE REASONING ENGINE
+app.post('/api/oracle', async (req, res) => {
+  console.log('--- Consulting Python Brain ---');
+  try {
+    const response = await fetch('http://localhost:8000/analyze_intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        console.error('Python Brain Error:', data);
+        return res.status(response.status).json(data);
+    }
+    res.json(data);
+  } catch (err) {
+    console.error('Python Brain Offline:', err.message);
+    res.status(503).json({ error: "Intelligence Engine Offline", message: "Start the Python brain.py server on port 8000." });
+  }
+});
+
 app.listen(3000, () => console.log('Running at http://localhost:3000'));
