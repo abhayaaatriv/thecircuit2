@@ -4279,6 +4279,15 @@
     // =====================================================================
     let aadhaarRefId = '';
 
+    function aadhaarErrorMessage(data, fallback) {
+      if (!data) return fallback;
+      if (typeof data.detail === 'string') return data.detail;
+      if (Array.isArray(data.detail) && data.detail.length) {
+        return data.detail.map(item => item.msg || item.message || JSON.stringify(item)).join('; ');
+      }
+      return data.error || data.message || fallback;
+    }
+
     async function aadhaarSendOtp() {
       const num = document.getElementById('aadhaarNumberInput').value.trim();
       const errEl = document.getElementById('aadhaarOtpErr');
@@ -4299,9 +4308,11 @@
           body: JSON.stringify({ aadhaar_number: num })
         });
         const data = await resp.json();
-        if (!resp.ok) throw new Error(data.detail || data.error || 'Failed to send OTP');
+        if (!resp.ok) throw new Error(aadhaarErrorMessage(data, 'Failed to send OTP'));
 
-        aadhaarRefId = data.ref_id;
+        aadhaarRefId = data.reference_id ?? data.ref_id ?? '';
+        aadhaarRefId = aadhaarRefId == null ? '' : String(aadhaarRefId).trim();
+        if (!aadhaarRefId) throw new Error('OTP sent but reference ID was missing. Please resend OTP.');
         document.getElementById('aadhaarOtpBlock').style.display = 'block';
         document.getElementById('aadhaarOtpInput').focus();
         showToast('OTP sent to your registered mobile!', 'success');
@@ -4323,18 +4334,28 @@
         errEl.textContent = 'Please enter the 6-digit OTP.';
         errEl.style.display = 'block'; return;
       }
+      if (!aadhaarRefId) {
+        errEl.textContent = 'OTP session expired. Please resend OTP.';
+        errEl.style.display = 'block'; return;
+      }
 
       const btn = document.querySelector('#aadhaarOtpBlock button');
       btn.textContent = 'Verifying…'; btn.disabled = true;
 
       try {
+        const referenceId = String(aadhaarRefId || '').trim();
         const resp = await fetch('/api/aadhaar/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ aadhaar_number: num, otp, ref_id: aadhaarRefId })
+          body: JSON.stringify({
+            aadhaar_number: num,
+            otp,
+            reference_id: referenceId,
+            ref_id: referenceId
+          })
         });
         const data = await resp.json();
-        if (!resp.ok) throw new Error(data.detail || data.error || 'OTP verification failed');
+        if (!resp.ok) throw new Error(aadhaarErrorMessage(data, 'OTP verification failed'));
 
         // Merge verified data into kycData
         const d = data.data || {};

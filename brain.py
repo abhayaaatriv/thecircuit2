@@ -2,6 +2,7 @@ import os
 import re
 import random
 import httpx
+from typing import Union
 
 # Load .env file
 _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
@@ -152,6 +153,21 @@ SANDBOX_API_SECRET = os.getenv("SANDBOX_API_SECRET", "")
 
 _token_cache = {"token": None}
 
+def safe_json(resp: httpx.Response):
+    try:
+        return resp.json()
+    except Exception:
+        return None
+
+def upstream_error_message(prefix: str, resp: httpx.Response) -> str:
+    body = safe_json(resp)
+    if isinstance(body, dict):
+      return f"{prefix}: {body.get('message') or body.get('detail') or body}"
+    raw = (resp.text or "").strip()
+    if raw:
+      return f"{prefix}: {raw[:500]}"
+    return f"{prefix}: HTTP {resp.status_code}"
+
 async def get_token() -> str:
     """Auto-fetch a fresh JWT — re-authenticates if token is missing."""
     if _token_cache["token"]:
@@ -165,10 +181,13 @@ async def get_token() -> str:
                 "x-api-version": "2.0",
             }
         )
-        body = resp.json()
+        body = safe_json(resp)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code,
+                                detail=upstream_error_message("Sandbox auth failed", resp))
         token = (body.get("data") or {}).get("access_token") or body.get("access_token")
         if not token:
-            raise HTTPException(status_code=500, detail=f"Sandbox auth failed: {body}")
+            raise HTTPException(status_code=500, detail=f"Sandbox auth failed: {body or resp.text}")
         _token_cache["token"] = token
         print(f"Sandbox token refreshed OK.")
         return token
@@ -186,9 +205,9 @@ class AadhaarOtpRequest(BaseModel):
     aadhaar_number: str   # 12-digit, no spaces
 
 class AadhaarVerifyRequest(BaseModel):
-    aadhaar_number: str
     otp:            str
-    ref_id:         str   # returned from /aadhaar/otp step
+    ref_id:         Union[str, int] = ""
+    reference_id:   Union[str, int] = ""
 
 @app.post("/aadhaar/otp")
 async def aadhaar_send_otp(req: AadhaarOtpRequest):
@@ -214,20 +233,28 @@ async def aadhaar_send_otp(req: AadhaarOtpRequest):
             json=payload
         )
 
-    body = resp.json()
+    body = safe_json(resp)
 
     if resp.status_code == 401:
         _token_cache["token"] = None  # force re-auth next call
         raise HTTPException(status_code=401, detail="Sandbox token expired — please retry")
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code,
-                            detail=body.get("message", "Sandbox OTP request failed"))
+                            detail=(body or {}).get("message") if isinstance(body, dict) and body.get("message")
+                            else upstream_error_message("Sandbox OTP request failed", resp))
 
-    ref_id = body.get("data", {}).get("ref_id") or body.get("ref_id")
+    ref_id = (
+        (body or {}).get("data", {}).get("reference_id")
+        or (body or {}).get("data", {}).get("ref_id")
+        or (body or {}).get("reference_id")
+        or (body or {}).get("ref_id")
+    )
+    ref_id = str(ref_id).strip() if ref_id not in (None, "") else ""
     return {
         "success": True,
         "ref_id":  ref_id,
-        "message": body.get("data", {}).get("message", "OTP sent successfully")
+        "reference_id": ref_id,
+        "message": (body or {}).get("data", {}).get("message", "OTP sent successfully")
     }
 
 
@@ -237,11 +264,15 @@ async def aadhaar_verify_otp(req: AadhaarVerifyRequest):
     Step 2 — Submit the OTP. On success returns verified name, DOB,
     address, gender, and photo (base64) straight from UIDAI via Sandbox.
     """
+    reference_id = req.reference_id or req.ref_id
+    reference_id = str(reference_id).strip() if reference_id not in (None, "") else ""
+    if not reference_id:
+        raise HTTPException(status_code=422, detail="reference_id is required for OTP verification")
+
     payload = {
-        "@entity":        "in.co.sandbox.kyc.aadhaar.okyc.otp.verify.request",
-        "aadhaar_number": re.sub(r'\s+', '', req.aadhaar_number),
-        "otp":            req.otp,
-        "ref_id":         req.ref_id
+        "@entity":      "in.co.sandbox.kyc.aadhaar.okyc.request",
+        "reference_id": str(reference_id),
+        "otp":          req.otp
     }
 
     async with httpx.AsyncClient(timeout=15) as client:
@@ -251,16 +282,17 @@ async def aadhaar_verify_otp(req: AadhaarVerifyRequest):
             json=payload
         )
 
-    body = resp.json()
+    body = safe_json(resp)
 
     if resp.status_code == 401:
         _token_cache["token"] = None
         raise HTTPException(status_code=401, detail="Sandbox token expired — please retry")
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code,
-                            detail=body.get("message", "OTP verification failed"))
+                            detail=(body or {}).get("message") if isinstance(body, dict) and body.get("message")
+                            else upstream_error_message("OTP verification failed", resp))
 
-    data = body.get("data", {})
+    data = (body or {}).get("data", {})
     return {
         "success": True,
         "data": {
@@ -269,7 +301,7 @@ async def aadhaar_verify_otp(req: AadhaarVerifyRequest):
             "gender":         data.get("gender"),
             "address":        data.get("address", {}),
             "photo":          data.get("photo"),   # base64 photo from UIDAI
-            "aadhaar_number": re.sub(r'\s+', '', req.aadhaar_number),
+            "reference_id":   str(reference_id),
         }
     }
 
