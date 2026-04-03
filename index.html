@@ -369,9 +369,29 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
 #organiserPage{display:none;position:fixed;inset:0;z-index:1000;background:var(--ink);color:var(--paper);overflow-y:auto;font-family:var(--font-body)}
 .org-sidebar{width:280px;background:rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.08);padding:32px 24px;display:flex;flex-direction:column;gap:32px;height:100vh;position:sticky;top:0}
 .org-main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
-.org-nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.2s}
-.org-nav-item:hover{background:rgba(255,255,255,0.05);color:#fff}
-.org-nav-item.active{background:var(--accent);color:#fff}
+.org-nav-item,.vendor-nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.2s}
+.org-nav-item:hover,.vendor-nav-item:hover{background:rgba(255,255,255,0.05);color:#fff}
+.org-nav-item.active,.vendor-nav-item.active{background:var(--accent);color:#fff}
+#vendorPage{display:none;position:fixed;inset:0;z-index:1000;background:var(--ink);color:var(--paper);overflow-y:auto;font-family:var(--font-body)}
+.vendor-sidebar{width:280px;background:rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.08);padding:32px 24px;display:flex;flex-direction:column;gap:32px;height:100vh;position:sticky;top:0}
+.vendor-main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
+.vendor-history-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px}
+.vendor-history-name{font-size:15px;font-weight:700;color:#fff}
+.vendor-history-meta{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px}
+.vendor-history-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.vendor-history-stat{background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;text-align:center}
+.vendor-history-stat strong{display:block;font-family:var(--font-display);font-size:20px;font-weight:700;color:#fff}
+.vendor-history-stat span{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.7px}
+.mini-event-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px}
+.mini-event-card h4{font-size:15px;color:#fff;margin-bottom:6px}
+.mini-event-card p{font-size:12px;color:rgba(255,255,255,0.42);line-height:1.6;margin-bottom:12px}
+.vendor-overview-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:18px;align-items:start}
+@media(max-width:900px){
+  .vendor-sidebar{display:none}
+  .vendor-main{padding:24px 20px 80px}
+  .vendor-history-grid{grid-template-columns:1fr}
+  .vendor-overview-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -391,7 +411,7 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
   <div class="nav-right">
     <div class="nav-location" onclick="fetchLocation()"><span class="loc-dot"></span><span id="locationText">Detecting…</span></div>
     <button class="btn-nav-ghost" onclick="openOrganiserPortal()">🎪 Organiser</button>
-    <button class="btn-nav" id="navMainBtn" onclick="openModal('authModal')">List My Stall ↗</button>
+    <button class="btn-nav" id="navMainBtn" onclick="enterVendorFlow('profile')">List My Stall ↗</button>
   </div>
 </nav>
 
@@ -404,7 +424,7 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
     </h1>
     <p class="hero-sub">Connect with the right events. Verify your business in minutes. Get AI-matched to events that actually convert — before you apply.</p>
     <div class="hero-cta-row">
-      <button class="btn-primary" onclick="openKYC()">Hi Vendor!→</button>
+      <button class="btn-primary" onclick="enterVendorFlow('profile')">Hi Vendor!→</button>
       <button class="btn-outline" onclick="startOrganiserOnboarding()">I'm an Organiser</button>
     </div>
     <div class="hero-stats">
@@ -453,7 +473,7 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
       <div class="match-label">✦ AI Event Matching Engine</div>
       <h3 class="match-title">Right event.<br>Right vendor.<br>Every time.</h3>
       <p class="match-sub">Our matching engine analyses your category, price range, city, past event performance, and footfall data to rank events by expected conversion — not just by date.</p>
-      <button class="btn-primary" style="margin-top:20px;width:auto;padding:12px 28px" onclick="openKYC()">Get Matched Now →</button>
+      <button class="btn-primary" style="margin-top:20px;width:auto;padding:12px 28px" onclick="enterVendorFlow('events')">Get Matched Now →</button>
     </div>
     <div class="match-card">
       <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:14px;letter-spacing:0.5px;text-transform:uppercase;font-weight:600">Sample — Sharma's Momos (Food)</div>
@@ -625,10 +645,10 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
       <div id="finalProfileSummary" style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.8"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
-      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');document.getElementById('events').scrollIntoView({behavior:'smooth'})">🗺️ Find Events</button>
-      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');openProfilePage()">👤 View Profile</button>
+      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');openVendorPortal('events')">🗺️ Find Events</button>
+      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');openVendorPortal('profile')">👤 View Profile</button>
     </div>
-    <button class="btn-submit" onclick="closeModal('kycModal');showToast('🎉 Welcome to TheCircuit! Profile is live.','success')">Start Exploring →</button>
+    <button class="btn-submit" onclick="closeModal('kycModal');openVendorPortal('overview')">Open Vendor Dashboard →</button>
   </div>
 </div>
 </div>
@@ -751,6 +771,95 @@ footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 
             </div>
             <button class="btn-submit" onclick="saveOrgPageProfile()">Save Dashboard Settings</button>
          </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- DEDICATED VENDOR PORTAL PAGE -->
+<div id="vendorPage">
+  <div style="display:flex">
+    <aside class="vendor-sidebar">
+      <div class="nav-logo" style="font-size:20px;margin-bottom:8px"><span class="logo-dot"></span>TheCircuit</div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.25);font-weight:700">Vendor Console</div>
+      <nav style="position:static;padding:0;background:none;border:none;flex-direction:column;align-items:stretch;display:flex;gap:4px;backdrop-filter:none">
+        <div class="vendor-nav-item active" data-page="overview" onclick="switchVendorPage('overview',this)"> Overview</div>
+        <div class="vendor-nav-item" data-page="events" onclick="switchVendorPage('events',this)"> Nearby Events</div>
+        <div class="vendor-nav-item" data-page="applications" onclick="switchVendorPage('applications',this)"> Applications</div>
+        <div class="vendor-nav-item" data-page="profile" onclick="switchVendorPage('profile',this)">👤 Profile</div>
+      </nav>
+      <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div id="sidebarVendorName" style="font-weight:700;color:#fff;font-size:14px">Vendor</div>
+        <div id="sidebarVendorMeta" style="font-size:11px;color:rgba(255,255,255,0.35)">Ready to match with nearby events</div>
+        <button onclick="closeVendorPortal()" style="width:100%;margin-top:16px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);border:none;padding:10px;border-radius:8px;font-size:12px;cursor:pointer">← Return to Landing Page</button>
+      </div>
+    </aside>
+
+    <main class="vendor-main" style="padding-top:24px">
+      <div id="vendorPage_overview">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+          <div><h1 style="font-family:var(--font-display);font-size:28px;font-weight:900;font-style:italic">Vendor Dashboard</h1><p style="font-size:13px;color:rgba(255,255,255,0.4)">Track nearby opportunities, past performance, and your earnings in one place.</p></div>
+          <div style="background:rgba(26,122,74,0.12);padding:10px 16px;border-radius:12px;border:1px solid rgba(26,122,74,0.25)"><div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:1px">LIVE STATUS</div><div id="vendorStatusBadge" style="font-weight:700;color:#fff;font-size:13px">Profile Active</div></div>
+        </div>
+        <div class="org-stat-row" style="margin-bottom:24px">
+          <div class="org-stat"><div class="org-stat-num" id="vendorStatCompleted">0</div><div class="org-stat-label">Events Completed</div></div>
+          <div class="org-stat"><div class="org-stat-num" id="vendorStatProfit">₹0</div><div class="org-stat-label">Profit Earned</div></div>
+          <div class="org-stat"><div class="org-stat-num" id="vendorStatPending">0</div><div class="org-stat-label">Pending Applications</div></div>
+          <div class="org-stat"><div class="org-stat-num" id="vendorStatWinRate">0%</div><div class="org-stat-label">Approval Rate</div></div>
+        </div>
+        <div class="vendor-overview-grid">
+          <div style="background:rgba(255,255,255,0.04);border-radius:24px;padding:24px;border:1px solid rgba(255,255,255,0.08)">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap"><h3 style="font-family:var(--font-display);font-style:italic">Previous Events & Profit Snapshot</h3><span style="font-size:11px;color:rgba(255,255,255,0.35)">Recent completed events</span></div>
+            <div id="vendorHistoryList" style="display:grid;gap:14px"></div>
+          </div>
+          <div style="display:grid;gap:18px">
+            <div style="background:rgba(255,255,255,0.04);border-radius:24px;padding:24px;border:1px solid rgba(255,255,255,0.08)">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap"><h3 style="font-family:var(--font-display);font-style:italic">Best Matches Nearby</h3><button onclick="switchVendorPage('events')" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:8px 14px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer">View All</button></div>
+              <div id="vendorBestMatches" style="display:grid;gap:12px"></div>
+            </div>
+            <div style="background:rgba(212,168,83,0.1);border-radius:24px;padding:24px;border:1px solid rgba(212,168,83,0.2)">
+              <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Revenue Intelligence</div>
+              <div id="vendorRevenueInsight" style="font-size:14px;color:#fff;line-height:1.7">Your strongest events and likely payout are shown here once your profile is active.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="vendorPage_events" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+          <div><h2 style="font-family:var(--font-display);font-style:italic">Nearby Events</h2><p style="font-size:13px;color:rgba(255,255,255,0.4)">Open event details, compare AI match scores, and apply directly from here.</p></div>
+          <button onclick="fetchLocation()" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer">Refresh Nearby Events</button>
+        </div>
+        <div class="event-grid" id="vendorPageEventGrid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"></div>
+      </div>
+
+      <div id="vendorPage_applications" style="display:none">
+        <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Applications & Activity</h2>
+        <div id="vendorPageAppsList"></div>
+      </div>
+
+      <div id="vendorPage_profile" style="display:none">
+        <h2 style="font-family:var(--font-display);font-style:italic;margin-bottom:24px">Vendor Profile</h2>
+        <div style="background:rgba(255,255,255,0.03);border-radius:24px;padding:32px;border:1px solid rgba(255,255,255,0.08);max-width:760px">
+          <div class="f-group"><label class="f-label">Business / Stall Name</label><input class="f-input" id="vendorInput_name" placeholder="Your brand name"></div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Category</label><input class="f-input" id="vendorInput_category" placeholder="Food Stall, Artist, Craft Brand"></div>
+            <div class="f-group"><label class="f-label">City</label><input class="f-input" id="vendorInput_city" placeholder="Delhi"></div>
+          </div>
+          <div class="f-group"><label class="f-label">About</label><textarea class="f-input" id="vendorInput_desc" rows="4" placeholder="Tell organisers what makes your setup special..."></textarea></div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Price Range</label><input class="f-input" id="vendorInput_priceRange" placeholder="₹100–₹500"></div>
+            <div class="f-group"><label class="f-label">Preferred Events</label><input class="f-input" id="vendorInput_preferredEvents" placeholder="Food fests, flea markets"></div>
+          </div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Verification Status</label><div id="vendorInput_verified" style="padding:11px 15px;background:rgba(212,168,83,0.1);color:var(--gold);border-radius:10px;font-weight:700;font-size:13px">Pending Verification</div></div>
+            <div class="f-group"><label class="f-label">Trust Score</label><div id="vendorInput_trust" style="padding:11px 15px;background:rgba(26,122,74,0.1);color:var(--green);border-radius:10px;font-weight:700;font-size:13px">62 / 100</div></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-submit" onclick="saveVendorPageProfile()">Save Vendor Profile</button>
+            <button onclick="openVendorKyc()" style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body)">Complete / Update eKYC</button>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -889,6 +998,99 @@ function fetchLocation(){
 
 // ===== REAL-TIME EVENTS (Overpass + District.in scrape via Claude) =====
 let vendorProfile=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+let latestNearbyEvents=[];
+
+function getVendorDefaults(){
+  return {
+    name:'',
+    category:'Food & Beverage',
+    city:userCity,
+    desc:'Complete your profile so organisers can quickly understand your setup and strengths.',
+    priceRange:'₹100–₹500',
+    preferredEvents:'Food fests, flea markets',
+    verified:false,
+    emoji:'🏪'
+  };
+}
+
+function syncVendorProfile(nextProfile){
+  vendorProfile={...getVendorDefaults(),...nextProfile};
+  sessionStorage.setItem('tc_profile',JSON.stringify(vendorProfile));
+  updateVendorNavCta();
+  return vendorProfile;
+}
+
+function ensureVendorProfile(seed={}){
+  const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+  return syncVendorProfile({...stored,...seed});
+}
+
+function updateVendorNavCta(){
+  const btn=document.getElementById('navMainBtn');
+  if(!btn) return;
+  const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+  const hasProfile=Boolean(stored.name||stored.desc||stored.category||stored.verified);
+  if(hasProfile){
+    const firstName=(stored.name||'Vendor').split(' ')[0];
+    btn.textContent=stored.verified?`Hi, ${firstName} ✓`:'Vendor Dashboard ↗';
+    btn.style.background=stored.verified?'var(--green)':'var(--accent)';
+    btn.onclick=()=>openVendorPortal('overview');
+  }else{
+    btn.textContent='List My Stall ↗';
+    btn.style.background='var(--accent)';
+    btn.onclick=()=>enterVendorFlow('profile');
+  }
+}
+
+function resetAuthFlow(){
+  document.getElementById('authPhone').value='';
+  document.getElementById('authPhoneErr').style.display='none';
+  document.getElementById('authOtpErr').style.display='none';
+  document.querySelectorAll('.otp-box').forEach(b=>{b.value='';b.style.borderColor='rgba(255,255,255,0.15)'});
+  authNext(1);
+}
+
+function startAuthFlow(role='vendor'){
+  resetAuthFlow();
+  selectAuthRole(role);
+  openModal('authModal');
+}
+
+function enterVendorFlow(page='overview'){
+  const stored=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+  if(stored.name||stored.desc||stored.category||stored.verified){
+    openVendorPortal(page);
+    return;
+  }
+  startAuthFlow('vendor');
+}
+
+function scoreEventForVendor(ev){
+  const cat=(vendorProfile.category||'Food').toLowerCase();
+  const key=`${ev.name||''}${ev.cat||''}`;
+  const seed=Array.from(key).reduce((sum,ch)=>sum+ch.charCodeAt(0),0)%10;
+  let score=55;
+  if(cat.includes('food')||cat.includes('beverage')){
+    if((ev.cat||'').toLowerCase().includes('food')||(ev.cat||'').toLowerCase().includes('fest')||(ev.name||'').toLowerCase().includes('grub')||(ev.name||'').toLowerCase().includes('food')) score=88+seed;
+    else if((ev.cat||'').toLowerCase().includes('market')||(ev.cat||'').toLowerCase().includes('culture')) score=68+seed;
+    else if((ev.cat||'').toLowerCase().includes('music')||(ev.cat||'').toLowerCase().includes('college')) score=42+seed;
+  }else if(cat.includes('artist')||cat.includes('music')){
+    if((ev.cat||'').toLowerCase().includes('music')||(ev.cat||'').toLowerCase().includes('festival')) score=89+seed;
+    else if((ev.cat||'').toLowerCase().includes('culture')||(ev.cat||'').toLowerCase().includes('art')) score=74+seed;
+    else score=48+seed;
+  }else if(cat.includes('craft')||cat.includes('handmade')||cat.includes('fashion')){
+    if((ev.cat||'').toLowerCase().includes('craft')||(ev.cat||'').toLowerCase().includes('bazaar')||(ev.cat||'').toLowerCase().includes('market')) score=90+seed;
+    else if((ev.cat||'').toLowerCase().includes('culture')||(ev.cat||'').toLowerCase().includes('art')) score=73+seed;
+    else score=45+seed;
+  }else{
+    score=58+seed;
+  }
+  return Math.min(score,98);
+}
+
+function scoreEventsForVendor(events){
+  return events.map(ev=>({...ev,matchScore:scoreEventForVendor(ev)})).sort((a,b)=>b.matchScore-a.matchScore);
+}
 
 async function fetchNearbyEvents(lat,lng){
   const grid=document.getElementById('eventGrid');
@@ -950,30 +1152,11 @@ async function fetchNearbyEvents(lat,lng){
   const fallback=getCuratedEvents();
   while(allEvents.length<3) allEvents.push(fallback[allEvents.length]||fallback[0]);
 
-  // AI match scoring
-  const cat=(vendorProfile.category||'Food').toLowerCase();
-  allEvents=allEvents.map(ev=>{
-    let score=50;
-    if(cat.includes('food')||cat.includes('beverage')){
-      if(ev.cat.toLowerCase().includes('food')||ev.cat.toLowerCase().includes('fest')||ev.name.toLowerCase().includes('grub')||ev.name.toLowerCase().includes('food')) score=90+Math.floor(Math.random()*9);
-      else if(ev.cat.toLowerCase().includes('market')||ev.cat.toLowerCase().includes('culture')) score=65+Math.floor(Math.random()*10);
-      else if(ev.cat.toLowerCase().includes('music')||ev.cat.toLowerCase().includes('college')) score=40+Math.floor(Math.random()*15);
-    }else if(cat.includes('artist')||cat.includes('music')){
-      if(ev.cat.toLowerCase().includes('music')||ev.cat.toLowerCase().includes('festival')) score=90+Math.floor(Math.random()*9);
-      else if(ev.cat.toLowerCase().includes('culture')||ev.cat.toLowerCase().includes('art')) score=75+Math.floor(Math.random()*10);
-      else score=45+Math.floor(Math.random()*20);
-    }else if(cat.includes('craft')||cat.includes('handmade')){
-      if(ev.cat.toLowerCase().includes('craft')||ev.cat.toLowerCase().includes('bazaar')||ev.cat.toLowerCase().includes('market')) score=92+Math.floor(Math.random()*8);
-      else if(ev.cat.toLowerCase().includes('culture')||ev.cat.toLowerCase().includes('art')) score=72+Math.floor(Math.random()*12);
-      else score=42+Math.floor(Math.random()*18);
-    }else score=55+Math.floor(Math.random()*30);
-    return {...ev,matchScore:score};
-  });
-
-  // Sort by match score descending
-  allEvents.sort((a,b)=>b.matchScore-a.matchScore);
+  allEvents=scoreEventsForVendor(allEvents);
+  latestNearbyEvents=[...allEvents];
 
   grid.innerHTML=allEvents.map(ev=>createEventTile(ev)).join('');
+  if(document.getElementById('vendorPage').style.display==='block') renderVendorEventFeed();
   grid.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
   document.getElementById('locationStatusText').textContent=`📍 ${userCity} — ${allEvents.length} events`;
 }
@@ -1047,6 +1230,10 @@ function applyToEvent(){
   apps.push({id:Date.now(),eventName:title,vendorName:vendorProfile.name||'Your Stall',status:'pending',appliedAt:new Date().toISOString()});
   sessionStorage.setItem('tc_applications',JSON.stringify(apps));
   closeModal('eventModal');
+  if(document.getElementById('vendorPage').style.display==='block'){
+    renderVendorApplications();
+    renderVendorOverview();
+  }
   showToast('🎉 Applied to '+title+'! Organiser will respond in 24h.','success');
 }
 
@@ -1405,9 +1592,7 @@ function buildFinalSummary(){
       <span style="color:var(--green)">Documents: ${Object.keys(docsUploaded).length} uploaded</span> · <span style="color:var(--green)">Face: ${kycData.faceVerified?'Verified':'Skipped'}</span>
     </div>
   `;
-  // Update nav button
-  const nb=document.getElementById('navMainBtn');
-  if(nb){nb.textContent=`Hi, ${(vendorProfile.name||'Vendor').split(' ')[0]} ✓`;nb.style.background='var(--green)';}
+  syncVendorProfile({...vendorProfile,verified:true});
   showToast('🎉 eKYC complete! Trust score: 94/100','success');
 }
 
@@ -1688,7 +1873,193 @@ function changeAppStatus(id,status){
   const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]').map(a=>a.id===id?{...a,status}:a);
   sessionStorage.setItem('tc_applications',JSON.stringify(apps));
   renderAppsList();updateOrgStats();
+  if(document.getElementById('vendorPage').style.display==='block'){
+    renderVendorApplications();
+    renderVendorOverview();
+  }
   showToast(status==='approved'?'✅ Vendor approved!':'❌ Vendor rejected.','success');
+}
+
+// ===== VENDOR PORTAL LOGIC =====
+function formatCurrency(num){
+  return '₹'+Number(num||0).toLocaleString('en-IN');
+}
+
+function getVendorHistory(){
+  const profile=ensureVendorProfile();
+  const cat=(profile.category||'').toLowerCase();
+  if(cat.includes('artist')||cat.includes('music')){
+    return [
+      {name:'NH7 Indie Side Stage', date:'Jan 2026', revenue:82000, profit:46800, footfall:'21,000', roi:'57%'},
+      {name:'Campus Beats Carnival', date:'Dec 2025', revenue:61000, profit:34500, footfall:'13,500', roi:'56%'},
+      {name:'Kala Ghoda Night Sessions', date:'Nov 2025', revenue:74000, profit:41200, footfall:'18,200', roi:'55%'}
+    ];
+  }
+  if(cat.includes('craft')||cat.includes('handmade')||cat.includes('fashion')){
+    return [
+      {name:'Dilli Haat Artisan Weekend', date:'Jan 2026', revenue:59000, profit:28100, footfall:'11,800', roi:'48%'},
+      {name:'Jaipur Craft Collective', date:'Dec 2025', revenue:67000, profit:32900, footfall:'14,600', roi:'49%'},
+      {name:'Bandra Flea Edit', date:'Nov 2025', revenue:54000, profit:24700, footfall:'9,300', roi:'46%'}
+    ];
+  }
+  return [
+    {name:'Delhi Street Food Carnival', date:'Jan 2026', revenue:98000, profit:37200, footfall:'24,000', roi:'38%'},
+    {name:'Horn OK Weekend', date:'Dec 2025', revenue:84000, profit:31600, footfall:'18,500', roi:'37%'},
+    {name:'City Culture Mela', date:'Nov 2025', revenue:72000, profit:27400, footfall:'15,200', roi:'38%'}
+  ];
+}
+
+function getVendorPortalEvents(){
+  const source=latestNearbyEvents.length?latestNearbyEvents:getCuratedEvents();
+  return scoreEventsForVendor(source).slice(0,6);
+}
+
+function viewVendorEventDetails(name){
+  const event=getVendorPortalEvents().find(ev=>ev.name===name)||getCuratedEvents().find(ev=>ev.name===name);
+  if(event){
+    openDistrictEvent(event.name,event.venue,event.date,event.emoji,event.footfall,event.cost,event.roi,event.cat);
+    return;
+  }
+  openDistrictEvent(name,userCity,'Upcoming','🎪','10,000+','₹5,000','₹15K–₹40K','Event');
+}
+
+function openVendorPortal(page='overview'){
+  ensureVendorProfile();
+  document.getElementById('vendorPage').style.display='block';
+  document.body.style.overflow='hidden';
+  renderVendorOverview();
+  renderVendorEventFeed();
+  renderVendorApplications();
+  renderVendorPageProfile();
+  switchVendorPage(page);
+}
+
+function closeVendorPortal(){
+  document.getElementById('vendorPage').style.display='none';
+  document.body.style.overflow='';
+}
+
+function switchVendorPage(page,el){
+  const activeEl=el||document.querySelector(`.vendor-nav-item[data-page="${page}"]`);
+  document.querySelectorAll('.vendor-nav-item').forEach(n=>n.classList.remove('active'));
+  if(activeEl) activeEl.classList.add('active');
+  ['overview','events','applications','profile'].forEach(section=>{
+    const el=document.getElementById('vendorPage_'+section);
+    if(el) el.style.display=section===page?'block':'none';
+  });
+  if(page==='events') renderVendorEventFeed();
+  if(page==='applications') renderVendorApplications();
+  if(page==='profile') renderVendorPageProfile();
+}
+
+function renderVendorOverview(){
+  const profile=ensureVendorProfile();
+  const history=getVendorHistory();
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  const totalProfit=history.reduce((sum,item)=>sum+item.profit,0);
+  const approved=apps.filter(a=>a.status==='approved').length;
+  const pending=apps.filter(a=>a.status==='pending').length;
+  const rate=apps.length?Math.round((approved/apps.length)*100):86;
+  document.getElementById('sidebarVendorName').textContent=profile.name||'Vendor';
+  document.getElementById('sidebarVendorMeta').textContent=`${profile.category||'Vendor'} · ${profile.city||userCity}`;
+  document.getElementById('vendorStatusBadge').textContent=profile.verified?'Verified & Ready':'Profile Active';
+  document.getElementById('vendorStatCompleted').textContent=history.length;
+  document.getElementById('vendorStatProfit').textContent=formatCurrency(totalProfit);
+  document.getElementById('vendorStatPending').textContent=pending;
+  document.getElementById('vendorStatWinRate').textContent=`${rate}%`;
+  document.getElementById('vendorHistoryList').innerHTML=history.map(item=>`
+    <div class="vendor-history-card">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap">
+        <div>
+          <div class="vendor-history-name">${item.name}</div>
+          <div class="vendor-history-meta">${item.date} · ${item.footfall} visitors</div>
+        </div>
+        <span class="status-badge sb-approved">Completed</span>
+      </div>
+      <div class="vendor-history-grid">
+        <div class="vendor-history-stat"><strong>${formatCurrency(item.revenue)}</strong><span>Revenue</span></div>
+        <div class="vendor-history-stat"><strong>${formatCurrency(item.profit)}</strong><span>Profit</span></div>
+        <div class="vendor-history-stat"><strong>${item.roi}</strong><span>Margin</span></div>
+      </div>
+    </div>`).join('');
+  const matches=getVendorPortalEvents().slice(0,3);
+  document.getElementById('vendorBestMatches').innerHTML=matches.map(ev=>`
+    <div class="mini-event-card">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:start">
+        <div>
+          <h4>${ev.name}</h4>
+          <p>${ev.venue} · ${ev.date}<br>${ev.cat}</p>
+        </div>
+        <div style="font-size:12px;color:var(--green);font-weight:700">${ev.matchScore}%</div>
+      </div>
+      <button onclick="viewVendorEventDetails('${ev.name.replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:9px 14px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer">Open Details</button>
+    </div>`).join('');
+  const topEvent=matches[0];
+  document.getElementById('vendorRevenueInsight').textContent=topEvent?`${topEvent.name} looks like your strongest nearby fit right now with a ${topEvent.matchScore}% match. Based on your past performance, a realistic profit band is ${formatCurrency(Math.round(totalProfit/history.length*0.8))} to ${formatCurrency(Math.round(totalProfit/history.length*1.1))}.`:'Complete your profile to unlock better revenue forecasts.';
+}
+
+function renderVendorEventFeed(){
+  const grid=document.getElementById('vendorPageEventGrid');
+  if(!grid) return;
+  const events=getVendorPortalEvents();
+  grid.innerHTML=events.map(ev=>createEventTile(ev)).join('');
+}
+
+function renderVendorApplications(){
+  const el=document.getElementById('vendorPageAppsList');
+  if(!el) return;
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  if(apps.length===0){
+    el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.35);padding:50px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px;font-size:14px">No event applications yet. Head to Nearby Events to start applying.</div>';
+    return;
+  }
+  el.innerHTML=apps.slice().reverse().map(app=>`
+    <div class="app-item ${app.status}">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#fff">${app.eventName}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35)">Applied ${new Date(app.appliedAt).toLocaleDateString()} · Vendor: ${app.vendorName}</div>
+        <span class="status-badge sb-${app.status}">${app.status.toUpperCase()}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="viewVendorEventDetails('${app.eventName.replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:8px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">View Details</button>
+        <button onclick="openChatRoom('Event Desk')" style="background:rgba(92,78,232,0.18);color:#c7c0ff;border:none;padding:8px 14px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer">Chat</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderVendorPageProfile(){
+  const profile=ensureVendorProfile();
+  document.getElementById('vendorInput_name').value=profile.name||'';
+  document.getElementById('vendorInput_category').value=profile.category||'';
+  document.getElementById('vendorInput_city').value=profile.city||userCity;
+  document.getElementById('vendorInput_desc').value=profile.desc||'';
+  document.getElementById('vendorInput_priceRange').value=profile.priceRange||'';
+  document.getElementById('vendorInput_preferredEvents').value=profile.preferredEvents||'';
+  document.getElementById('vendorInput_verified').textContent=profile.verified?'Verified Vendor ✓':'Pending Verification';
+  document.getElementById('vendorInput_verified').style.background=profile.verified?'rgba(26,122,74,0.1)':'rgba(212,168,83,0.1)';
+  document.getElementById('vendorInput_verified').style.color=profile.verified?'var(--green)':'var(--gold)';
+  document.getElementById('vendorInput_trust').textContent=profile.verified?'94 / 100':'62 / 100';
+}
+
+function saveVendorPageProfile(){
+  const next=syncVendorProfile({
+    ...vendorProfile,
+    name:document.getElementById('vendorInput_name').value.trim()||vendorProfile.name,
+    category:document.getElementById('vendorInput_category').value.trim()||vendorProfile.category,
+    city:document.getElementById('vendorInput_city').value.trim()||vendorProfile.city||userCity,
+    desc:document.getElementById('vendorInput_desc').value.trim()||vendorProfile.desc,
+    priceRange:document.getElementById('vendorInput_priceRange').value.trim()||vendorProfile.priceRange,
+    preferredEvents:document.getElementById('vendorInput_preferredEvents').value.trim()||vendorProfile.preferredEvents
+  });
+  renderVendorPageProfile();
+  renderVendorOverview();
+  renderVendorEventFeed();
+  showToast(`Profile saved for ${next.name||'your stall'}!`,'success');
+}
+
+function openVendorKyc(){
+  closeVendorPortal();
+  openKYC();
 }
 
 // ===== VENDOR DETAIL =====
@@ -1774,31 +2145,7 @@ function hideRoomTyping(){roomTypingEl?.remove();roomTypingEl=null;}
 
 // ===== PROFILE PAGE =====
 function openProfilePage(){
-  const p=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
-  const el=document.getElementById('profileContent');
-  el.innerHTML=`
-    <div style="height:180px;background:linear-gradient(135deg,#2d0a2d,#6b1a5c,#1a4a6b);display:flex;align-items:center;justify-content:center;font-size:72px;position:relative">
-      ${p.emoji||'🏪'}
-      <div style="position:absolute;top:14px;right:14px;display:flex;gap:8px">
-        ${p.verified?'<span style="background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px">✓ VERIFIED</span>':''}
-        <button onclick="closeProfilePage()" style="background:rgba(0,0,0,0.4);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
-      </div>
-    </div>
-    <div style="padding:28px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-        <div><h2 style="font-family:var(--font-display);font-size:28px;font-weight:900;font-style:italic;color:#fff;margin-bottom:4px">${p.name||'Your Stall'}</h2><div style="font-size:13px;color:rgba(255,255,255,0.4)">${p.category||'Food & Beverage'} · 📍 ${p.city||userCity}</div></div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.3)">Trust Score</div><div style="font-size:18px;font-weight:700;color:var(--green)">${p.verified?'94/100':'—'}</div></div>
-      </div>
-      ${p.desc?`<div style="background:rgba(255,255,255,0.04);border-radius:14px;padding:16px;margin-bottom:16px"><div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">About</div><p style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7">${p.desc}</p></div>`:''}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">${p.priceRange||'₹100–₹500'}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Price Range</div></div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">${p.preferredEvents||'All Types'}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Preferred Events</div></div>
-      </div>
-      <button onclick="closeProfilePage();openKYC()" style="width:100%;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);margin-bottom:10px">✏️ Edit / Re-verify Profile</button>
-      <button onclick="closeProfilePage();document.getElementById('events').scrollIntoView({behavior:'smooth'})" class="btn-submit">Find Matching Events →</button>
-    </div>`;
-  document.getElementById('profilePage').style.display='flex';
-  document.body.style.overflow='hidden';
+  openVendorPortal('profile');
 }
 function closeProfilePage(){document.getElementById('profilePage').style.display='none';document.body.style.overflow='';}
 
@@ -1840,8 +2187,8 @@ function verifyAuthOTP(){
     document.getElementById('authOtpErr').style.display='none';
     const welcome = authRole === 'organiser' ? 'Organiser Portal' : 'Vendor Dashboard';
     document.getElementById('authWelcomeName').textContent = `Welcome to your ${welcome}! 🎉`;
-    document.getElementById('authWelcomeDesc').textContent = authRole === 'organiser' ? 'Start listing your event and finding the perfect vendors today.' : 'Complete your verification to start matching with major events.';
-    document.getElementById('authFinalBtn').textContent = authRole === 'organiser' ? 'Go to Organiser Portal →' : 'Complete eKYC Verification →';
+    document.getElementById('authWelcomeDesc').textContent = authRole === 'organiser' ? 'Start listing your event and finding the perfect vendors today.' : 'Open your vendor profile, explore nearby events, and apply from one dashboard.';
+    document.getElementById('authFinalBtn').textContent = authRole === 'organiser' ? 'Go to Organiser Portal →' : 'Open Vendor Dashboard →';
     authNext(4);
   }else{
     document.getElementById('authOtpErr').style.display='block';
@@ -1855,7 +2202,8 @@ function authFinalAction(){
   if(authRole === 'organiser'){
     startOrganiserOnboarding();
   } else {
-    openKYC();
+    ensureVendorProfile({city:userCity});
+    openVendorPortal('profile');
   }
 }
 
@@ -1865,12 +2213,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Stats counter
   let c=0;const si=document.getElementById('statEvents');
   setInterval(()=>{if(c<20){c++;si.textContent=(2400+c)+'+'}},150);
-  // Restore profile
-  const p=sessionStorage.getItem('tc_profile');
-  if(p){
-    const parsed=JSON.parse(p);
-    if(parsed.name){const nb=document.getElementById('navMainBtn');nb.textContent=`Hi, ${parsed.name.split(' ')[0]} ✓`;nb.style.background='var(--green)';nb.onclick=openProfilePage;}
-  }
+  updateVendorNavCta();
 });
 </script>
 </body>
