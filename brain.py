@@ -1,4 +1,17 @@
 import os
+import re
+import random
+import httpx
+
+# Load .env file
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(_env_path):
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith('#') and '=' in _line:
+                _k, _v = _line.split('=', 1)
+                os.environ.setdefault(_k.strip(), _v.strip())
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
@@ -120,7 +133,6 @@ async def calculate_match(data: MatchRequest):
         score += 15
         
     # Random Variance for "Realism"
-    import random
     score = min(99, score + random.randint(-5, 5))
     
     return {
@@ -128,6 +140,139 @@ async def calculate_match(data: MatchRequest):
         "verdict": "High Potential" if score > 85 else "Strong Fit" if score > 70 else "Average Match",
         "algorithm": "Python Vector-Sim v2"
     }
+# =====================================================================
+#  SANDBOX.CO.IN AADHAAR OFFLINE eKYC
+#  Step 1: POST /aadhaar/otp   → sends OTP to registered mobile
+#  Step 2: POST /aadhaar/verify → submits OTP, returns verified data
+# =====================================================================
+
+SANDBOX_BASE       = "https://api.sandbox.co.in"
+SANDBOX_API_KEY    = os.getenv("SANDBOX_API_KEY", "")
+SANDBOX_API_SECRET = os.getenv("SANDBOX_API_SECRET", "")
+
+_token_cache = {"token": None}
+
+async def get_token() -> str:
+    """Auto-fetch a fresh JWT — re-authenticates if token is missing."""
+    if _token_cache["token"]:
+        return _token_cache["token"]
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.post(
+            f"{SANDBOX_BASE}/authenticate",
+            headers={
+                "x-api-key":     SANDBOX_API_KEY,
+                "x-api-secret":  SANDBOX_API_SECRET,
+                "x-api-version": "2.0",
+            }
+        )
+        body = resp.json()
+        token = (body.get("data") or {}).get("access_token") or body.get("access_token")
+        if not token:
+            raise HTTPException(status_code=500, detail=f"Sandbox auth failed: {body}")
+        _token_cache["token"] = token
+        print(f"Sandbox token refreshed OK.")
+        return token
+
+async def sandbox_headers() -> dict:
+    token = await get_token()
+    return {
+        "x-api-key":     SANDBOX_API_KEY,
+        "Authorization": token,
+        "x-api-version": "2.0",
+        "Content-Type":  "application/json",
+    }
+
+class AadhaarOtpRequest(BaseModel):
+    aadhaar_number: str   # 12-digit, no spaces
+
+class AadhaarVerifyRequest(BaseModel):
+    aadhaar_number: str
+    otp:            str
+    ref_id:         str   # returned from /aadhaar/otp step
+
+@app.post("/aadhaar/otp")
+async def aadhaar_send_otp(req: AadhaarOtpRequest):
+    """
+    Step 1 — Send OTP to the mobile number registered with Aadhaar.
+    Returns ref_id needed for the verify step.
+    """
+    clean = re.sub(r'\s+', '', req.aadhaar_number)
+    if not re.fullmatch(r'\d{12}', clean):
+        raise HTTPException(status_code=400, detail="Aadhaar number must be exactly 12 digits")
+
+    payload = {
+        "@entity":        "in.co.sandbox.kyc.aadhaar.okyc.otp.request",
+        "aadhaar_number": clean,
+        "consent":        "y",
+        "reason":         "For KYC on TheCircuit"
+    }
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.post(
+            f"{SANDBOX_BASE}/kyc/aadhaar/okyc/otp",
+            headers=await sandbox_headers(),
+            json=payload
+        )
+
+    body = resp.json()
+
+    if resp.status_code == 401:
+        _token_cache["token"] = None  # force re-auth next call
+        raise HTTPException(status_code=401, detail="Sandbox token expired — please retry")
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code,
+                            detail=body.get("message", "Sandbox OTP request failed"))
+
+    ref_id = body.get("data", {}).get("ref_id") or body.get("ref_id")
+    return {
+        "success": True,
+        "ref_id":  ref_id,
+        "message": body.get("data", {}).get("message", "OTP sent successfully")
+    }
+
+
+@app.post("/aadhaar/verify")
+async def aadhaar_verify_otp(req: AadhaarVerifyRequest):
+    """
+    Step 2 — Submit the OTP. On success returns verified name, DOB,
+    address, gender, and photo (base64) straight from UIDAI via Sandbox.
+    """
+    payload = {
+        "@entity":        "in.co.sandbox.kyc.aadhaar.okyc.otp.verify.request",
+        "aadhaar_number": re.sub(r'\s+', '', req.aadhaar_number),
+        "otp":            req.otp,
+        "ref_id":         req.ref_id
+    }
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.post(
+            f"{SANDBOX_BASE}/kyc/aadhaar/okyc/otp/verify",
+            headers=await sandbox_headers(),
+            json=payload
+        )
+
+    body = resp.json()
+
+    if resp.status_code == 401:
+        _token_cache["token"] = None
+        raise HTTPException(status_code=401, detail="Sandbox token expired — please retry")
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code,
+                            detail=body.get("message", "OTP verification failed"))
+
+    data = body.get("data", {})
+    return {
+        "success": True,
+        "data": {
+            "name":           data.get("name"),
+            "dob":            data.get("dob"),
+            "gender":         data.get("gender"),
+            "address":        data.get("address", {}),
+            "photo":          data.get("photo"),   # base64 photo from UIDAI
+            "aadhaar_number": re.sub(r'\s+', '', req.aadhaar_number),
+        }
+    }
+
 
 if __name__ == "__main__":
     print("🧠 TheCircuit AI Brain is waking up on port 8000...")

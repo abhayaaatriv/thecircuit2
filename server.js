@@ -68,10 +68,6 @@ app.post('/api/gemini', async (req, res) => {
 app.post('/api/claude', async (req, res) => {
   console.log('--- Outgoing Request to Anthropic ---');
   try {
-    const payload = { ...req.body };
-    if (payload.model === 'claude-sonnet-4-6') {
-      payload.model = 'claude-sonnet-4-20250514';
-    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -79,13 +75,47 @@ app.post('/api/claude', async (req, res) => {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(req.body)
     });
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// AADHAAR eKYC — Step 1: Send OTP
+app.post('/api/aadhaar/otp', async (req, res) => {
+  console.log('--- Aadhaar OTP Request ---');
+  try {
+    const response = await fetch('http://localhost:8000/aadhaar/otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    const data = await response.json();
+    if (!response.ok) return res.status(response.status).json(data);
+    res.json(data);
+  } catch (err) {
+    res.status(503).json({ error: 'eKYC Engine Offline', message: 'Start brain.py on port 8000.' });
+  }
+});
+
+// AADHAAR eKYC — Step 2: Verify OTP
+app.post('/api/aadhaar/verify', async (req, res) => {
+  console.log('--- Aadhaar OTP Verify ---');
+  try {
+    const response = await fetch('http://localhost:8000/aadhaar/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    const data = await response.json();
+    if (!response.ok) return res.status(response.status).json(data);
+    res.json(data);
+  } catch (err) {
+    res.status(503).json({ error: 'eKYC Engine Offline', message: 'Start brain.py on port 8000.' });
   }
 });
 
@@ -100,13 +130,13 @@ app.post('/api/oracle', async (req, res) => {
     });
     const data = await response.json();
     if (!response.ok) {
-      console.error('Python Brain Error:', data);
-      return res.status(response.status).json(data);
+        console.error('Python Brain Error:', data);
+        return res.status(response.status).json(data);
     }
     res.json(data);
   } catch (err) {
     console.error('Python Brain Offline:', err.message);
-    res.status(503).json({ error: 'Intelligence Engine Offline', message: 'Start the Python brain.py server on port 8000.' });
+    res.status(503).json({ error: "Intelligence Engine Offline", message: "Start the Python brain.py server on port 8000." });
   }
 });
 
