@@ -68,6 +68,10 @@ app.post('/api/gemini', async (req, res) => {
 app.post('/api/claude', async (req, res) => {
   console.log('--- Outgoing Request to Anthropic ---');
   try {
+    const payload = { ...req.body };
+    if (payload.model === 'claude-sonnet-4-6') {
+      payload.model = 'claude-sonnet-4-20250514';
+    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -75,7 +79,7 @@ app.post('/api/claude', async (req, res) => {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(payload)
     });
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
@@ -96,13 +100,13 @@ app.post('/api/oracle', async (req, res) => {
     });
     const data = await response.json();
     if (!response.ok) {
-        console.error('Python Brain Error:', data);
-        return res.status(response.status).json(data);
+      console.error('Python Brain Error:', data);
+      return res.status(response.status).json(data);
     }
     res.json(data);
   } catch (err) {
     console.error('Python Brain Offline:', err.message);
-    res.status(503).json({ error: "Intelligence Engine Offline", message: "Start the Python brain.py server on port 8000." });
+    res.status(503).json({ error: 'Intelligence Engine Offline', message: 'Start the Python brain.py server on port 8000.' });
   }
 });
 
