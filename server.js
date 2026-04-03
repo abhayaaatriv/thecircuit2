@@ -9,7 +9,7 @@ try {
     const [key, ...rest] = line.split('=');
     if (key && rest.length) process.env[key.trim()] = rest.join('=').trim();
   });
-} catch (e) {}
+} catch (e) { }
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -42,8 +42,8 @@ app.post('/api/gemini', async (req, res) => {
     // Auto-pick best available if current fails
     let model = req.body.model || 'gemini-1.5-flash';
     if (availableModels.length && !availableModels.includes(model)) {
-        model = availableModels.find(m => m.includes('flash')) || availableModels.find(m => m.includes('pro')) || availableModels[0];
-        console.log(`Fallback: Using discovered model "${model}" instead.`);
+      model = availableModels.find(m => m.includes('flash')) || availableModels.find(m => m.includes('pro')) || availableModels[0];
+      console.log(`Fallback: Using discovered model "${model}" instead.`);
     }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -137,6 +137,19 @@ app.post('/api/oracle', async (req, res) => {
   } catch (err) {
     console.error('Python Brain Offline:', err.message);
     res.status(503).json({ error: "Intelligence Engine Offline", message: "Start the Python brain.py server on port 8000." });
+  }
+});
+
+// AI PROFIT PROJECTION AGENT PROXY
+app.post('/api/roi-prediction', async (req, res) => {
+  try {
+    const response = await fetch('http://localhost:8000/predict_roi', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    res.json(await response.json());
+  } catch (err) {
+    res.status(503).json({ error: "ROI Agent Offline" });
   }
 });
 

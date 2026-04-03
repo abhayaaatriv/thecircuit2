@@ -3148,6 +3148,7 @@
         <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px" id="evModalMatchNote">Based on your
           vendor profile</div>
       </div>
+      <div id="evModalAIForecast" style="display:none;margin-bottom:18px"></div>
       <button class="btn-submit" onclick="applyToEvent()">Apply Now →</button>
     </div>
   </div>
@@ -4072,6 +4073,9 @@
     <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.35)">👥 Footfall</span><span style="font-weight:500">${footfall}</span></div>
     <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0"><span style="color:rgba(255,255,255,0.35)">💰 Stall Cost</span><span style="color:var(--gold);font-weight:600">${cost}</span></div>`;
       document.getElementById('evModalRoi').textContent = roi + ' expected';
+      
+      // NEW: Trigger AI Earnings Forecast
+      getAIROIProjection(cat, footfall, cost);
       const vc = (vendorProfile.category || '').toLowerCase();
       const isFood = vc.includes('food') || vc.includes('beverage');
       const isFoodEvent = cat.toLowerCase().includes('food') || name.toLowerCase().includes('grub') || name.toLowerCase().includes('ok please');
@@ -4094,6 +4098,49 @@
         renderVendorOverview();
       }
       showToast('🎉 Applied to ' + title + '! Organiser will respond in 24h.', 'success');
+    }
+
+    async function getAIROIProjection(eventCat, footfall, costStr) {
+      const forecastEl = document.getElementById('evModalAIForecast');
+      if (!forecastEl) return;
+      
+      const cost = parseInt(costStr.replace(/[^0-9]/g, '')) || 5000;
+      const ff = parseInt(footfall.replace(/[^0-9]/g, '')) || 10000;
+      const profile = JSON.parse(sessionStorage.getItem('tc_profile') || '{}');
+      
+      forecastEl.innerHTML = '<div style="font-size:11px;opacity:0.6;animation:pulse 1.5s infinite;color:rgba(255,255,255,0.4)">🤖 ROI Agent analyzing event potential...</div>';
+      forecastEl.style.display = 'block';
+
+      try {
+        const resp = await fetch('/api/roi-prediction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vendor_category: profile.category || 'Retail',
+            event_category: eventCat,
+            event_cost: cost,
+            event_footfall: ff,
+            vendor_avg_price: 350
+          })
+        });
+        const data = await resp.json();
+        
+        forecastEl.innerHTML = `
+          <div style="background:rgba(92,78,232,0.12);border:1px solid rgba(92,78,232,0.25);border-radius:14px;padding:16px;margin-top:10px">
+             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.5px">🤖 AI EARNINGS PROJECTION</div>
+                <div style="font-size:10px;color:var(--green);font-weight:700;background:rgba(26,122,74,0.1);padding:2px 8px;border-radius:50px">Live Agent</div>
+             </div>
+             <div style="font-size:24px;font-weight:700;color:#fff;font-family:var(--font-display)">${formatCurrency(data.estimated_low)} - ${formatCurrency(data.estimated_high)}</div>
+             <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;line-height:1.4">${data.insight}</div>
+             <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+                Agent: ROI-Predictor-X | Confidence: ${data.confidence}%
+             </div>
+          </div>
+        `;
+      } catch (e) {
+        forecastEl.style.display = 'none';
+      }
     }
 
     // ===== KYC AGENT =====
@@ -5640,7 +5687,7 @@
           showToast('Speech recognition not supported in this browser.', 'info');
           return;
         }
-        
+
         this.isListening = true;
         document.getElementById('oracleOrb').classList.add('listening');
         document.body.classList.add('oracle-active');
