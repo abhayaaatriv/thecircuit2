@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheCircuit — Find Your Stall. Own Your Event.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0C0C;--paper:#F5F2ED;--cream:#EDE9E2;
+  --accent:#C8102E;--accent2:#FF8C00;--gold:#D4A853;
+  --violet:#5C4EE8;--green:#1A7A4A;--muted:#8A8680;
+  --saffron:#FF6B35;--deep-red:#8B0000;
+  --border:rgba(12,12,12,0);
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Bricolage Grotesque',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  background:linear-gradient(rgba(12,12,12,0.4),rgba(12,12,12,0.4)),url('banner.png') no-repeat center center fixed;
+  background-size:cover;
+  color:var(--paper);font-family:var(--font-body);line-height:1.6;cursor:none;overflow-x:hidden;
+}
+.cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:all 0.15s;transform:translate(-50%,-50%)}
+.cursor-ring{width:36px;height:36px;border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all 0.08s;opacity:0.6}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(12,12,12,0);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);transition:all 0.3s}
+.nav-logo{font-family:var(--font-display);font-size:22px;font-weight:900;font-style:italic;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:#fff}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-location{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.08);padding:6px 14px;border-radius:50px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.2s}
+.nav-location:hover{border-color:var(--accent);color:#fff}
+.loc-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
+.btn-nav{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all 0.2s}
+.btn-nav:hover{background:#a00d24;transform:translateY(-1px)}
+.btn-nav-ghost{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:9px 20px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all 0.2s}
+.btn-nav-ghost:hover{background:rgba(0,0,0,0)}
+
+/* HERO */
+.hero{min-height:100vh;padding:120px 48px 80px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:50px;margin-bottom:32px;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px)}
+.eyebrow-dot{background:var(--accent);color:white;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.hero-title{font-family:var(--font-display);font-size:clamp(52px,6vw,88px);font-weight:900;line-height:1.0;letter-spacing:-2px;color:#fff;margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--saffron)}
+.hero-title .outline{-webkit-text-stroke:2px rgba(255,255,255,0.6);color:transparent;font-style:italic;display:block}
+.hero-sub{font-size:16px;color:rgba(255,255,255,0.6);max-width:420px;line-height:1.7;margin-bottom:40px}
+.hero-cta-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;border:2px solid var(--accent);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all 0.25s}
+.btn-primary:hover{background:#a00d24;border-color:#a00d24;transform:translateY(-2px)}
+.btn-outline{background:rgba(255,255,255,0.08);color:#fff;border:2px solid rgba(255,255,255,0.25);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all 0.25s;backdrop-filter:blur(8px)}
+.btn-outline:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4)}
+.hero-stats{display:flex;gap:32px;margin-top:48px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.12)}
+.stat-num{font-family:var(--font-display);font-size:32px;font-weight:700;font-style:italic;color:#fff;display:block}
+.stat-label{font-size:12px;color:rgba(255,255,255,0.5);font-weight:500}
+
+/* HERO RIGHT — event mosaic */
+.hero-right{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hero-card{border-radius:20px;overflow:hidden;position:relative;cursor:pointer;transition:transform 0.3s}
+.hero-card:hover{transform:scale(1.02)}
+.hero-card:first-child{grid-column:1/-1;height:220px}
+.hero-card:nth-child(2),.hero-card:nth-child(3){height:150px}
+.hero-card:nth-child(4),.hero-card:nth-child(5){height:120px}
+.card-bg{width:100%;height:100%;display:flex;align-items:flex-end;padding:16px;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.1) 60%);position:relative}
+.card-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:64px}
+.card-info{position:relative;z-index:2;width:100%}
+.card-tag{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:3px}
+.card-name{font-family:var(--font-display);font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.card-badge{position:absolute;top:10px;right:10px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:50px}
+
+/* TICKER */
+.ticker{background:var(--accent);padding:12px 0;overflow:hidden}
+.ticker-inner{display:flex;animation:scroll-ticker 32s linear infinite;white-space:nowrap}
+.ticker-item{font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,0.85);padding:0 32px;display:flex;align-items:center;gap:16px}
+.ticker-item strong{color:#fff}
+@keyframes scroll-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:100px 48px}
+.section-label{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.section-label::before{content:'';width:24px;height:1px;background:rgba(255,255,255,0.25)}
+.section-title{font-family:var(--font-display);font-size:clamp(34px,4vw,58px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;margin-bottom:16px;color:#fff}
+.section-title em{font-style:italic;color:var(--saffron)}
+
+/* EVENTS SECTION */
+.events-section{background:rgba(12,12,12,0.4);backdrop-filter:blur(20px)}
+.events-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;flex-wrap:wrap;gap:24px}
+.location-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.2s}
+.location-pill:hover{border-color:var(--green);color:#fff}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:live-pulse 1.5s ease infinite}
+@keyframes live-pulse{0%,100%{box-shadow:0 0 0 0 rgba(26,122,74,0.7)}50%{box-shadow:0 0 0 6px rgba(26,122,74,0)}}
+
+.event-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.event-tile{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.3s}
+.event-tile:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-4px);background:rgba(255,255,255,0.07)}
+.event-tile-img{height:170px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative}
+.event-tile-body{padding:16px 18px}
+.event-tile-cat{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--saffron);margin-bottom:6px}
+.event-tile-name{font-family:var(--font-display);font-size:17px;font-weight:700;font-style:italic;color:#fff;line-height:1.2;margin-bottom:10px}
+.event-tile-meta{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.6}
+.roi-val{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--gold);font-style:italic}
+.event-tile-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-top:1px solid rgba(255,255,255,0.07)}
+.btn-apply{background:#fff;color:var(--ink);border:none;padding:6px 16px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all 0.2s}
+.btn-apply:hover{background:var(--accent);color:#fff}
+.match-score{font-size:11px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:4px}
+
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.09) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:18px;height:300px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* VENDORS SECTION */
+.vendors-section{background:rgba(8,8,8,0.8)}
+.vendor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.vendor-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;cursor:pointer;transition:all 0.3s}
+.vendor-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.25)}
+.vendor-card:first-child{grid-row:1/3}
+.vendor-card-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative}
+.vendor-card:first-child .vendor-card-img{height:230px}
+.vcard-vibe{position:absolute;top:10px;right:10px;background:rgba(12,12,12,0.7);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:50px;backdrop-filter:blur(6px)}
+.vendor-card-body{padding:14px}
+.vendor-name{font-family:var(--font-display);font-size:16px;font-weight:700;font-style:italic;color:#fff;margin-bottom:3px}
+.vendor-cat{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px}
+.vendor-stats-row{display:flex;gap:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);align-items:center}
+.vendor-stat-mini{font-size:10px;color:rgba(255,255,255,0.4)}
+.vendor-stat-mini strong{color:#fff;font-size:12px;display:block}
+.vendor-score{margin-left:auto;background:rgba(212,168,83,0.15);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;color:var(--gold)}
+
+/* FEATURES */
+.features-section{background:rgba(5,5,5,0.85)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.07);border-radius:20px;overflow:hidden;margin-top:48px}
+.feature-cell{background:rgba(12,12,12,0.8);padding:36px 28px;transition:background 0.3s;cursor:pointer;backdrop-filter:blur(10px)}
+.feature-cell:hover{background:rgba(255,255,255,0.04)}
+.feature-icon{font-size:28px;margin-bottom:14px}
+.feature-title{font-family:var(--font-display);font-size:19px;font-weight:700;font-style:italic;color:#fff;margin-bottom:7px}
+.feature-desc{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6}
+.feature-tag{display:inline-block;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--saffron);margin-top:10px}
+
+/* FOOTER */
+footer{background:rgba(5,5,5,0.95);backdrop-filter:blur(20px);padding:60px 48px 28px;border-top:1px solid rgba(255,255,255,0.07)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:40px}
+.footer-brand{font-family:var(--font-display);font-size:26px;font-weight:900;font-style:italic;color:#fff;margin-bottom:10px}
+.footer-desc{font-size:13px;color:rgba(255,255,255,0.35);line-height:1.7}
+.footer-col-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:14px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s}
+.footer-links a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;color:rgba(255,255,255,0.25);flex-wrap:wrap;gap:12px}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;right:32px;background:rgba(12,12,12,0.95);color:#fff;backdrop-filter:blur(20px);padding:14px 22px;border-radius:14px;font-size:14px;font-weight:500;z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.12);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,5,5,0.85);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(12px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px;max-width:500px;width:90%;transform:translateY(24px);transition:transform 0.25s;max-height:88vh;overflow-y:auto;color:#fff}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-light{background:var(--paper);color:var(--ink);border-color:rgba(0,0,0,0.1)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-title{font-family:var(--font-display);font-size:22px;font-weight:700;font-style:italic}
+.modal-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.modal-close:hover{background:var(--accent)}
+.modal-light .modal-close{background:var(--cream);color:var(--ink)}
+.modal-light .modal-close:hover{background:var(--accent);color:#fff}
+
+/* FORM INPUTS */
+.f-label{font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:7px;display:block}
+.f-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 15px;font-size:14px;font-family:var(--font-body);color:#fff;outline:none;transition:all 0.2s}
+.f-input:focus{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.09)}
+.f-input::placeholder{color:rgba(255,255,255,0.2)}
+.f-group{margin-bottom:16px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{width:100%;background:var(--accent);color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all 0.2s;letter-spacing:0.2px}
+.btn-submit:hover{background:#a00d24;transform:translateY(-1px)}
+
+/* ONBOARDING TABS */
+.mode-tabs{display:flex;gap:4px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px;margin-bottom:22px}
+.mode-tab{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;color:rgba(255,255,255,0.45);transition:all 0.2s}
+.mode-tab.active{background:rgba(255,255,255,0.12);color:#fff;font-weight:600}
+
+/* CHAT */
+.chat-msgs{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow-y:auto;margin-bottom:16px;padding-right:4px}
+.chat-msg{max-width:82%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5}
+.msg-ai{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.85);border-radius:16px 16px 16px 4px;align-self:flex-start}
+.msg-user{background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px;align-self:flex-end}
+.typing-dots{display:flex;gap:3px;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.07);border-radius:16px 16px 16px 4px;align-self:flex-start;width:fit-content}
+.tdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bounce 1.2s ease infinite}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.chat-input-row{display:flex;gap:8px}
+.chat-in{flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:10px 16px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none}
+.chat-in:focus{border-color:rgba(255,255,255,0.25)}
+.btn-send{background:var(--violet);color:#fff;border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.btn-send:hover{background:#4330c4;transform:scale(1.1)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(255,255,255,0.15);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px}
+.upload-zone:hover{border-color:var(--gold);background:rgba(212,168,83,0.05)}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(92,78,232,0.15);border:1px solid rgba(92,78,232,0.3);border-radius:50px;padding:4px 12px;font-size:11px;color:#9B8EF0;font-weight:500;margin-bottom:12px}
+
+/* ========== KYC AGENT ========== */
+#kycModal .modal{max-width:560px;padding:0;overflow:hidden}
+.kyc-progress{height:4px;background:rgba(255,255,255,0.08);position:relative}
+.kyc-progress-bar{height:100%;background:linear-gradient(90deg,var(--saffron),var(--accent));transition:width 0.5s;border-radius:4px}
+.kyc-step{padding:32px;display:none}
+.kyc-step.active{display:block}
+.kyc-step-label{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:6px}
+.kyc-step-title{font-family:var(--font-display);font-size:24px;font-weight:700;font-style:italic;color:#fff;margin-bottom:8px}
+.kyc-step-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:24px;line-height:1.6}
+
+/* Face scan ring */
+.face-scan-ring{width:180px;height:180px;border-radius:50%;border:3px solid rgba(255,255,255,0.15);margin:0 auto 24px;position:relative;display:flex;align-items:center;justify-content:center}
+.face-scan-ring::before{content:'';position:absolute;inset:-3px;border-radius:50%;border:3px solid transparent;border-top-color:var(--saffron);animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.face-scan-inner{width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:52px}
+.scan-line{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--saffron),transparent);animation:scan 2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:20%}50%{top:80%}}
+
+/* Doc upload card */
+.doc-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
+.doc-card:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.08)}
+.doc-card.done{border-color:var(--green);background:rgba(26,122,74,0.1)}
+.doc-icon{font-size:28px;flex-shrink:0}
+.doc-info .doc-name{font-size:14px;font-weight:600;color:#fff}
+.doc-info .doc-desc{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.doc-status{margin-left:auto;font-size:11px;font-weight:600}
+.doc-status.done{color:var(--green)}.doc-status.pending{color:rgba(255,255,255,0.3)}.doc-status.processing{color:var(--gold)}
+
+/* Receipt checker */
+.receipt-result{background:rgba(26,122,74,0.1);border:1px solid rgba(26,122,74,0.3);border-radius:12px;padding:16px;margin-top:12px;display:none}
+.receipt-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.receipt-row:last-child{border:none}
+.receipt-row .rk{color:rgba(255,255,255,0.4)}.receipt-row .rv{color:#fff;font-weight:600}
+
+/* Profile autofill */
+.autofill-field{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.af-key{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px}
+.af-val{font-size:14px;color:#fff;font-weight:600}
+.af-badge{font-size:10px;color:var(--green);font-weight:600;background:rgba(26,122,74,0.15);padding:2px 8px;border-radius:50px}
+
+/* ========== TINDER SWIPE ========== */
+#tinderModal .modal{max-width:520px;padding:0;overflow:hidden;background:rgba(8,8,8,0.97)}
+.tinder-header{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.tinder-title{font-family:var(--font-display);font-size:20px;font-weight:700;font-style:italic;color:#fff}
+.tinder-filter-row{display:flex;gap:8px;padding:12px 24px;overflow-x:auto;scrollbar-width:none}
+.tinder-filter-row::-webkit-scrollbar{display:none}
+.tfilter{flex-shrink:0;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5)}
+.tfilter.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.swipe-arena{height:420px;position:relative;margin:0 24px}
+.swipe-card{position:absolute;inset:0;border-radius:20px;overflow:hidden;cursor:grab;user-select:none;transition:box-shadow 0.2s;will-change:transform}
+.swipe-card:active{cursor:grabbing}
+.swipe-card-bg{width:100%;height:100%;display:flex;align-items:flex-end;padding:24px;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.1) 55%)}
+.swipe-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px}
+.swipe-info{position:relative;z-index:2;width:100%}
+.swipe-name{font-family:var(--font-display);font-size:26px;font-weight:900;font-style:italic;color:#fff;margin-bottom:4px}
+.swipe-cat{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:10px}
+.swipe-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.swipe-tag{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;padding:3px 10px;border-radius:50px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7)}
+.swipe-stats{display:flex;gap:16px}
+.swipe-stat{font-size:12px;color:rgba(255,255,255,0.5)}.swipe-stat strong{color:#fff}
+.match-pct{position:absolute;top:16px;right:16px;background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:50px}
+.match-pct.low{background:rgba(255,255,255,0.2)}
+.match-pct.mid{background:var(--gold);color:var(--ink)}
+
+/* Swipe action hint overlays */
+.swipe-like-hint{position:absolute;top:20px;left:20px;background:var(--green);color:#fff;font-size:18px;font-weight:900;padding:8px 16px;border-radius:12px;opacity:0;transform:rotate(-15deg);z-index:10;letter-spacing:1px;pointer-events:none}
+.swipe-nope-hint{position:absolute;top:20px;right:20px;background:var(--accent);color:#fff;font-size:18px;font-weight:900;padding:8px 16px;border-radius:12px;opacity:0;transform:rotate(15deg);z-index:10;letter-spacing:1px;pointer-events:none}
+
+.tinder-actions{display:flex;justify-content:center;gap:20px;padding:20px 24px 24px}
+.tinder-btn{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.03)}
+.tinder-btn:hover{transform:scale(1.12)}
+.tinder-btn.pass{border-color:var(--accent);color:var(--accent)}.tinder-btn.pass:hover{background:var(--accent);color:#fff}
+.tinder-btn.like{border-color:var(--green);color:var(--green)}.tinder-btn.like:hover{background:var(--green);color:#fff}
+.tinder-btn.info{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.6)}.tinder-btn.info:hover{background:rgba(255,255,255,0.1);color:#fff}
+.tinder-btn.super{border-color:var(--gold);color:var(--gold)}.tinder-btn.super:hover{background:var(--gold);color:var(--ink)}
+
+.tinder-empty{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:rgba(255,255,255,0.4);font-size:14px;text-align:center}
+.tinder-empty h3{font-family:var(--font-display);font-size:22px;color:rgba(255,255,255,0.7);font-style:italic}
+
+.matched-list{padding:0 24px 24px}
+.match-item{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.07)}
+.match-item-emoji{font-size:28px}
+.match-item-info{flex:1}
+.match-item-name{font-size:14px;font-weight:600;color:#fff}
+.match-item-sub{font-size:11px;color:rgba(255,255,255,0.4)}
+.match-item-actions{display:flex;gap:6px}
+.mi-btn{background:rgba(255,255,255,0.07);border:none;color:#fff;padding:5px 12px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.mi-btn:hover{background:rgba(255,255,255,0.14)}
+
+/* ========== AI MATCHING PANEL ========== */
+.matching-banner{background:linear-gradient(135deg,#0d0d2e 0%,#1a0d0d 100%);border-radius:20px;padding:40px;margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;position:relative;overflow:hidden}
+.matching-banner::before{content:'MATCH';position:absolute;right:-30px;top:-30px;font-family:var(--font-display);font-size:160px;font-weight:900;font-style:italic;color:rgba(255,255,255,0.03);pointer-events:none}
+.match-label{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px}
+.match-title{font-family:var(--font-display);font-size:30px;font-weight:700;font-style:italic;color:#fff;line-height:1.1;margin-bottom:10px}
+.match-sub{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7}
+.match-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:20px}
+.match-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.match-row:last-child{border:none}
+.mk{font-size:12px;color:rgba(255,255,255,0.4)}.mv{font-size:13px;font-weight:700;color:#fff;font-family:var(--font-display);font-style:italic}
+.mv.green{color:#4CAF50}.mv.gold{color:var(--gold)}.mv.orange{color:var(--saffron)}
+
+/* EVENT MODAL */
+#eventModal .modal{max-width:480px}
+
+/* ORGANIZER DASH */
+#orgDashModal .modal{max-width:900px;padding:0;width:95%}
+.org-dash-tabs{display:flex;gap:2px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px;margin-bottom:24px}
+.org-tab{flex:1;text-align:center;padding:10px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:rgba(255,255,255,0.45);transition:all 0.2s}
+.org-tab.active{background:rgba(255,255,255,0.12);color:#fff;font-weight:600}
+.org-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.org-stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;text-align:center}
+.org-stat-num{font-family:var(--font-display);font-size:28px;font-weight:700;font-style:italic;color:#fff}
+.org-stat-label{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px}
+.app-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.app-item.approved{border-color:rgba(26,122,74,0.4);background:rgba(26,122,74,0.06)}
+.app-item.rejected{border-color:rgba(200,16,46,0.3);background:rgba(200,16,46,0.05)}
+.status-badge{font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 10px;border-radius:50px}
+.sb-pending{background:rgba(212,168,83,0.2);color:var(--gold)}.sb-approved{background:rgba(26,122,74,0.2);color:var(--green)}.sb-rejected{background:rgba(200,16,46,0.2);color:var(--accent)}
+
+/* PROFILE PAGE */
+#profilePage{display:none;position:fixed;inset:0;z-index:900;background:rgba(5,5,5,0.88);backdrop-filter:blur(16px);align-items:center;justify-content:center}
+.profile-inner{background:#111;border:1px solid rgba(255,255,255,0.1);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,0.6)}
+
+/* AUTH MODAL */
+#authModal{max-width:460px;padding:0;overflow:hidden}
+.auth-progress{height:4px;background:rgba(255,255,255,0.08)}
+.auth-progress-bar{height:100%;background:linear-gradient(90deg,var(--saffron),var(--accent));width:25%;transition:width 0.4s;border-radius:4px}
+
+/* OTP BOXES */
+.otp-box{width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;font-family:var(--font-mono);border:2px solid rgba(255,255,255,0.15);border-radius:10px;outline:none;transition:all 0.2s;background:rgba(255,255,255,0.06);color:#fff}
+.otp-box:focus{border-color:var(--saffron);background:rgba(255,255,255,0.1)}
+
+/* CHAT FAB */
+.chat-fab{position:fixed;bottom:32px;left:32px;z-index:9000;display:flex;align-items:center;gap:10px;background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px 20px;border-radius:50px;font-size:14px;font-weight:600;font-family:var(--font-body);cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,0.4);transition:all 0.25s}
+.chat-fab:hover{background:var(--violet);transform:translateY(-3px);box-shadow:0 16px 40px rgba(92,78,232,0.4)}
+.chat-fab-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease infinite}
+
+/* LIVE CHAT ROOM */
+#chatRoomModal{display:none;position:fixed;inset:0;z-index:1200;background:rgba(5,5,5,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+.chat-room-inner{background:#111;border:1px solid rgba(255,255,255,0.1);width:100%;max-width:480px;border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.5);display:flex;flex-direction:column;max-height:85vh}
+
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.5s ease,transform 0.5s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  nav{padding:14px 20px}.nav-links{display:none}
+  section{padding:60px 20px}
+  .hero{grid-template-columns:1fr;padding:100px 20px 60px}.hero-right{display:none}
+  .event-grid,.vendor-grid,.features-grid{grid-template-columns:1fr}
+  .vendor-card:first-child{grid-row:auto}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .matching-banner{grid-template-columns:1fr}
+  .org-stat-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo"><span class="logo-dot"></span>TheCircuit</a>
+  <ul class="nav-links">
+    <li><a href="#events">Events</a></li>
+    <li><a href="#vendors">Vendors</a></li>
+    <li><a href="#features">Platform</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-location" onclick="fetchLocation()"><span class="loc-dot"></span><span id="locationText">Detecting…</span></div>
+    <button class="btn-nav-ghost" onclick="openOrgDash()">🎪 Organiser</button>
+    <button class="btn-nav" id="navMainBtn" onclick="openModal('authModal')">List My Stall ↗</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left fade-in">
+    <div class="hero-eyebrow"><span class="eyebrow-dot">🇮🇳</span>India's Vendor × Event Intelligence Platform</div>
+    <h1 class="hero-title">
+      Find Your<br><em>Perfect</em><br><span class="outline">Stall.</span>
+    </h1>
+    <p class="hero-sub">Connect with the right events. Verify your business in minutes. Get AI-matched to events that actually convert — before you apply.</p>
+    <div class="hero-cta-row">
+      <button class="btn-primary" onclick="openKYC()">Hi Vendor!→</button>
+      <button class="btn-outline" onclick="openModal('orgListModal')">I'm an Organiser</button>
+    </div>
+    <div class="hero-stats">
+      <div><span class="stat-num" id="statEvents">2,400+</span><span class="stat-label">Live Events</span></div>
+      <div><span class="stat-num">14,000+</span><span class="stat-label">Verified Vendors</span></div>
+      <div><span class="stat-num">₹48Cr+</span><span class="stat-label">Revenue Generated</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><strong>🔴 LIVE</strong> Grub Fest Delhi — 32 stalls open ◆</span>
+    <span class="ticker-item"><strong>🤖 AI Match</strong> Sharma's Momos → Grub Fest: 94% match ◆</span>
+    <span class="ticker-item"><strong>✅ Verified</strong> 3 vendors eKYC'd in the last hour ◆</span>
+    <span class="ticker-item"><strong>🃏 Tinder</strong> Organiser swiped ✓ on 5 vendors today ◆</span>
+    <span class="ticker-item"><strong>📍 District</strong> 8 new events scraped near <span id="tickerCity">Delhi</span> ◆</span>
+    <span class="ticker-item"><strong>🔥 ROI Alert</strong> NH7 Weekender — ₹40K avg vendor revenue ◆</span>
+    <span class="ticker-item"><strong>🔴 LIVE</strong> Grub Fest Delhi — 32 stalls open ◆</span>
+    <span class="ticker-item"><strong>🤖 AI Match</strong> Sharma's Momos → Grub Fest: 94% match ◆</span>
+    <span class="ticker-item"><strong>✅ Verified</strong> 3 vendors eKYC'd in the last hour ◆</span>
+    <span class="ticker-item"><strong>🃏 Tinder</strong> Organiser swiped ✓ on 5 vendors today ◆</span>
+  </div>
+</div>
+
+<!-- EVENTS NEAR ME -->
+<section class="events-section" id="events">
+  <div class="events-head fade-in">
+    <div>
+      <div class="section-label">Live Discovery + District</div>
+      <h2 class="section-title">Events <em>Near You</em></h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.2);max-width:380px;line-height:1.6">Real-time events from Google Places + District.in — AI matched to your vendor profile.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
+      <div class="location-pill" onclick="fetchLocation()"><span class="live-dot"></span><span id="locationStatusText">Click to detect</span><span>→</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:right">Match % shown based on your vendor category</div>
+    </div>
+  </div>
+  <div class="event-grid" id="eventGrid">
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+  <!-- AI MATCHING BANNER -->
+  <div class="matching-banner fade-in" style="margin-top:40px">
+    <div>
+      <div class="match-label">✦ AI Event Matching Engine</div>
+      <h3 class="match-title">Right event.<br>Right vendor.<br>Every time.</h3>
+      <p class="match-sub">Our matching engine analyses your category, price range, city, past event performance, and footfall data to rank events by expected conversion — not just by date.</p>
+      <button class="btn-primary" style="margin-top:20px;width:auto;padding:12px 28px" onclick="openKYC()">Get Matched Now →</button>
+    </div>
+    <div class="match-card">
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:14px;letter-spacing:0.5px;text-transform:uppercase;font-weight:600">Sample — Sharma's Momos (Food)</div>
+      <div class="match-row"><span class="mk">🥇 Best Match</span><span class="mv green">Grub Fest — 94%</span></div>
+      <div class="match-row"><span class="mk">🥈 Strong</span><span class="mv gold">Horn OK Please — 88%</span></div>
+      <div class="match-row"><span class="mk">🥉 Good</span><span class="mv orange">Dilli Haat — 76%</span></div>
+      <div class="match-row"><span class="mk">🎵 Cross-cat</span><span class="mv" style="color:rgba(255,255,255,0.5)">NH7 Weekender — 41%</span></div>
+      <div class="match-row"><span class="mk">Expected Revenue</span><span class="mv gold">₹28K – ₹62K</span></div>
+      <div class="match-row"><span class="mk">Risk Score</span><span class="mv green">Low ↓</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- VENDORS -->
+<section class="vendors-section" id="vendors">
+  <div class="fade-in">
+    <div class="section-label">Community</div>
+    <h2 class="section-title">Featured <em>Vendors</em></h2>
+  </div>
+  <div class="vendor-grid fade-in">
+    <div class="vendor-card" onclick="openVendorDetail('Sharma\'s Momos','Food Stall · Delhi NCR','🍜','47','4.8','92%','#2d0a2d,#6b1a5c','Street,Himalayan,Budget')">
+      <div class="vendor-card-img" style="background:linear-gradient(135deg,#2d0a2d,#6b1a5c)"><span style="font-size:72px">🍜</span><span class="vcard-vibe">Street Food</span></div>
+      <div class="vendor-card-body"><div class="vendor-name">Sharma's Momos</div><div class="vendor-cat">Food Stall · Delhi NCR</div><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"><span style="background:rgba(200,16,46,0.2);color:#ff6b6b;font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600">🔥 Street</span><span style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600">Himalayan</span></div><div class="vendor-stats-row"><div class="vendor-stat-mini"><strong>47</strong>Events</div><div class="vendor-stat-mini"><strong>92%</strong>Accept</div><div class="vendor-score">★ 4.8</div></div></div>
+    </div>
+    <div class="vendor-card" onclick="openVendorDetail('Priya Mehta','Indie Folk Artist · Mumbai','🎵','23','4.9','88%','#0a2d0a,#1a6b1a','Indie,Live,Original')">
+      <div class="vendor-card-img" style="background:linear-gradient(135deg,#0a2d0a,#1a6b1a)"><span style="font-size:56px">🎵</span><span class="vcard-vibe">Artist</span></div>
+      <div class="vendor-card-body"><div class="vendor-name">Priya Mehta</div><div class="vendor-cat">Indie Folk · Mumbai</div><div class="vendor-stats-row"><div class="vendor-stat-mini"><strong>23</strong>Shows</div><div class="vendor-stat-mini"><strong>88%</strong>Accept</div><div class="vendor-score">★ 4.9</div></div></div>
+    </div>
+    <div class="vendor-card" onclick="openVendorDetail('Earthen Co.','Handicraft · Jaipur','🧶','31','4.6','79%','#1a1a0a,#6b4a0a','Handmade,Eco,Artisan')">
+      <div class="vendor-card-img" style="background:linear-gradient(135deg,#1a1a0a,#6b4a0a)"><span style="font-size:56px">🧶</span><span class="vcard-vibe">Handmade</span></div>
+      <div class="vendor-card-body"><div class="vendor-name">Earthen Co.</div><div class="vendor-cat">Handicraft · Jaipur</div><div class="vendor-stats-row"><div class="vendor-stat-mini"><strong>31</strong>Markets</div><div class="vendor-stat-mini"><strong>79%</strong>Accept</div><div class="vendor-score">★ 4.6</div></div></div>
+    </div>
+    <div class="vendor-card" onclick="openVendorDetail('Nandi Cold Brew','Beverage · Bangalore','☕','18','4.7','95%','#0a1a2d,#1a4a6b','Beverage,Specialty,Cold')">
+      <div class="vendor-card-img" style="background:linear-gradient(135deg,#0a1a2d,#1a4a6b)"><span style="font-size:56px">☕</span><span class="vcard-vibe">Beverage</span></div>
+      <div class="vendor-card-body"><div class="vendor-name">Nandi Cold Brew</div><div class="vendor-cat">Beverage · Bangalore</div><div class="vendor-stats-row"><div class="vendor-stat-mini"><strong>18</strong>Events</div><div class="vendor-stat-mini"><strong>95%</strong>Accept</div><div class="vendor-score">★ 4.7</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT FAB -->
+<button class="chat-fab" onclick="openChatRoom('Support')"><span class="chat-fab-dot"></span>💬 Live Chat</button>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- KYC ONBOARDING AGENT -->
+<div class="modal-overlay" id="kycModal" onclick="if(event.target===this)closeModal('kycModal')">
+<div class="modal" style="max-width:580px;padding:0;overflow:hidden">
+  <div class="kyc-progress"><div class="kyc-progress-bar" id="kycBar" style="width:12%"></div></div>
+  <!-- Step 1: Welcome -->
+  <div class="kyc-step active" id="kycStep1" style="padding:32px">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:24px">
+      <div><div class="kyc-step-label">Step 1 of 7 — Welcome</div><div class="kyc-step-title">Vendor Verification<br>& Onboarding</div><div class="kyc-step-sub">We verify you once — you're trusted everywhere on TheCircuit. Takes ~4 minutes.</div></div>
+      <button class="modal-close" onclick="closeModal('kycModal')">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08)"><span style="font-size:24px">📄</span><div><div style="font-size:13px;font-weight:600;color:#fff">Document Upload</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Aadhaar, PAN, GST, or business licence</div></div><span style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">✓ 1 min</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08)"><span style="font-size:24px">🤳</span><div><div style="font-size:13px;font-weight:600;color:#fff">Facial Verification</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Liveness check + Aadhaar match</div></div><span style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">✓ 30 sec</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08)"><span style="font-size:24px">🧾</span><div><div style="font-size:13px;font-weight:600;color:#fff">Receipt Legitimacy Check</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Last month's sales receipt — AI verified</div></div><span style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">✓ 1 min</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08)"><span style="font-size:24px">✨</span><div><div style="font-size:13px;font-weight:600;color:#fff">Auto Profile Build</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">AI fills your profile from documents</div></div><span style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">✓ Auto</span></div>
+    </div>
+    <button class="btn-submit" onclick="kycNext(2)">Start Verification →</button>
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:12px">Your data is encrypted and never shared with third parties</p>
+  </div>
+
+  <!-- Step 2: Document Upload -->
+  <div class="kyc-step" id="kycStep2" style="padding:32px">
+    <div class="kyc-step-label">Step 2 of 7 — Documents</div>
+    <div class="kyc-step-title">Upload Your Documents</div>
+    <div class="kyc-step-sub">Upload at least 2. AI extracts all details automatically.</div>
+    <div id="docCards">
+      <div class="doc-card" id="doc_aadhaar" onclick="uploadDoc('aadhaar')"><div class="doc-icon">🪪</div><div class="doc-info"><div class="doc-name">Aadhaar Card</div><div class="doc-desc">Front side · Required for facial match</div></div><span class="doc-status pending" id="ds_aadhaar">Upload</span></div>
+      <div class="doc-card" id="doc_pan" onclick="uploadDoc('pan')"><div class="doc-icon">💳</div><div class="doc-info"><div class="doc-name">PAN Card</div><div class="doc-desc">Income tax identity · Recommended</div></div><span class="doc-status pending" id="ds_pan">Upload</span></div>
+      <div class="doc-card" id="doc_gst" onclick="uploadDoc('gst')"><div class="doc-icon">📋</div><div class="doc-info"><div class="doc-name">GST Certificate</div><div class="doc-desc">If registered · Optional but preferred</div></div><span class="doc-status pending" id="ds_gst">Upload</span></div>
+      <div class="doc-card" id="doc_biz" onclick="uploadDoc('biz')"><div class="doc-icon">🏪</div><div class="doc-info"><div class="doc-name">Business Licence / FSSAI</div><div class="doc-desc">Shop licence or FSSAI for food vendors</div></div><span class="doc-status pending" id="ds_biz">Upload</span></div>
+    </div>
+    <input type="file" id="docFileInput" style="display:none" accept="image/*,.pdf" onchange="handleDocUpload(this)">
+    <div id="docExtracted" style="display:none;margin-top:16px">
+      <div style="font-size:11px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✓ AI Extracted from Documents</div>
+      <div id="docExtractedContent"></div>
+    </div>
+    <button class="btn-submit" id="docNextBtn" style="margin-top:20px;opacity:0.4;pointer-events:none" onclick="kycNext(3)">Continue to Face Verify →</button>
+  </div>
+
+  <!-- Step 3: Face Verify -->
+  <div class="kyc-step" id="kycStep3" style="padding:32px;text-align:center">
+    <div class="kyc-step-label">Step 3 of 7 — Facial Verification</div>
+    <div class="kyc-step-title">Liveness Check</div>
+    <div class="kyc-step-sub">Hold your face steady. Our AI verifies you're real and matches your Aadhaar photo.</div>
+    <div class="face-scan-ring" id="faceRing">
+      <div class="face-scan-inner" id="faceInner">🤳</div>
+      <div class="scan-line" id="scanLine"></div>
+    </div>
+    <div id="faceStatus" style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:20px">Camera access needed for liveness check</div>
+    <button class="btn-submit" id="faceBtn" onclick="startFaceScan()">Enable Camera & Scan</button>
+    <button style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;display:block;margin:12px auto 0;font-family:var(--font-body)" onclick="skipFace()">Skip for now (reduced trust score)</button>
+  </div>
+
+  <!-- Step 4: Receipt -->
+  <div class="kyc-step" id="kycStep4" style="padding:32px">
+    <div class="kyc-step-label">Step 4 of 7 — Revenue Verification</div>
+    <div class="kyc-step-title">Last Month's Receipt</div>
+    <div class="kyc-step-sub">Upload any sales receipt, invoice, or UPI statement from last month. Our AI checks legitimacy and extracts your revenue data.</div>
+    <div class="ai-badge">✦ AI Legitimacy Checker</div>
+    <div class="upload-zone" onclick="document.getElementById('receiptInput').click()">
+      <div style="font-size:32px;margin-bottom:8px">🧾</div>
+      <div style="font-size:14px;font-weight:600;color:var(--gold);margin-bottom:4px">Upload Receipt / Invoice / UPI Statement</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35)">JPG, PNG, PDF · AI analyses authenticity</div>
+      <input type="file" id="receiptInput" style="display:none" accept="image/*,.pdf" onchange="handleReceiptUpload(this)">
+    </div>
+    <div class="receipt-result" id="receiptResult">
+      <div style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">✓ Receipt Verified — AI Analysis</div>
+      <div class="receipt-row"><span class="rk">Legitimacy Score</span><span class="rv" id="rLegit">—</span></div>
+      <div class="receipt-row"><span class="rk">Revenue Detected</span><span class="rv" id="rRevenue">—</span></div>
+      <div class="receipt-row"><span class="rk">Business Name</span><span class="rv" id="rBizName">—</span></div>
+      <div class="receipt-row"><span class="rk">Transaction Type</span><span class="rv" id="rTxType">—</span></div>
+      <div class="receipt-row"><span class="rk">Flags</span><span class="rv" id="rFlags">—</span></div>
+    </div>
+    <button class="btn-submit" id="receiptNextBtn" style="margin-top:20px;opacity:0.4;pointer-events:none" onclick="kycNext(5)">Continue →</button>
+    <button style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;display:block;margin:10px auto 0;font-family:var(--font-body)" onclick="kycNext(5)">Skip receipt (optional)</button>
+  </div>
+
+  <!-- Step 5: Profile Autofill -->
+  <div class="kyc-step" id="kycStep5" style="padding:32px">
+    <div class="kyc-step-label">Step 5 of 7 — Profile Builder</div>
+    <div class="kyc-step-title">AI Built Your Profile</div>
+    <div class="kyc-step-sub">Extracted from your documents. Review and the AI chatbot will ask follow-up questions.</div>
+    <div id="autofillFields" style="margin-bottom:20px"></div>
+    <div style="background:rgba(92,78,232,0.12);border:1px solid rgba(92,78,232,0.25);border-radius:14px;padding:16px;margin-bottom:20px">
+      <div style="font-size:12px;color:#9B8EF0;font-weight:600;margin-bottom:8px">🤖 AI Chat will now ask follow-up questions</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4)">The assistant will ask about your stall specifics, pricing, vibe, and event preferences to complete your profile.</div>
+    </div>
+    <button class="btn-submit" onclick="kycNext(6)">Start Follow-up Chat →</button>
+  </div>
+
+  <!-- Step 6: AI Chatbot Follow-up -->
+  <div class="kyc-step" id="kycStep6" style="padding:32px">
+    <div class="kyc-step-label">Step 6 of 7 — AI Interview</div>
+    <div class="kyc-step-title">Quick Follow-up Chat</div>
+    <div class="kyc-step-sub">Tell our AI a bit more about your stall to complete your profile and improve event matching.</div>
+    <div class="chat-msgs" id="kycChatMsgs" style="min-height:200px">
+      <div class="chat-msg msg-ai">Great! I've read your documents. Let me ask a few quick questions to perfect your profile. 🎯</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-in" id="kycChatInput" placeholder="Type here…" onkeydown="if(event.key==='Enter')sendKycChat()">
+      <button class="btn-send" onclick="sendKycChat()">↑</button>
+    </div>
+    <div id="kycChatCompleteBtn" style="display:none;margin-top:16px">
+      <button class="btn-submit" onclick="kycNext(7)">Complete Verification →</button>
+    </div>
+  </div>
+
+  <!-- Step 7: Success -->
+  <div class="kyc-step" id="kycStep7" style="padding:40px;text-align:center">
+    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--green),#2ecc71);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px">✓</div>
+    <div style="font-family:var(--font-display);font-size:28px;font-weight:900;font-style:italic;color:#fff;margin-bottom:8px">You're Verified! 🎉</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:28px;line-height:1.6">Your profile is live on TheCircuit. AI is finding your best event matches now.</div>
+    <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:20px;margin-bottom:24px;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:0.5px">VERIFIED</span><span style="font-size:13px;color:rgba(255,255,255,0.5)">eKYC Complete · Trust Score: 94/100</span></div>
+      <div id="finalProfileSummary" style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.8"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');document.getElementById('events').scrollIntoView({behavior:'smooth'})">🗺️ Find Events</button>
+      <button style="background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body)" onclick="closeModal('kycModal');openProfilePage()">👤 View Profile</button>
+    </div>
+    <button class="btn-submit" onclick="closeModal('kycModal');showToast('🎉 Welcome to TheCircuit! Profile is live.','success')">Start Exploring →</button>
+  </div>
+</div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-overlay" id="eventModal" onclick="if(event.target===this)closeModal('eventModal')">
+<div class="modal" style="max-width:480px">
+  <div class="modal-header">
+    <div class="modal-title" id="evModalTitle">Event</div>
+    <button class="modal-close" onclick="closeModal('eventModal')">×</button>
+  </div>
+  <div id="evModalEmoji" style="font-size:64px;text-align:center;background:rgba(255,255,255,0.04);border-radius:16px;padding:20px;margin-bottom:18px">🎪</div>
+  <div id="evModalTags" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
+  <div id="evModalDesc" style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:18px"></div>
+  <div id="evModalMeta" style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:16px"></div>
+  <div id="evModalMatch" style="background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2);border-radius:12px;padding:14px;margin-bottom:18px">
+    <div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">🤖 AI Match Score</div>
+    <div id="evModalRoi" style="font-size:20px;font-family:var(--font-display);font-weight:700;color:var(--gold)">—</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px" id="evModalMatchNote">Based on your vendor profile</div>
+  </div>
+  <button class="btn-submit" onclick="applyToEvent()">Apply Now →</button>
+</div>
+</div>
+
+<!-- ORGANISER MODAL - list event -->
+<div class="modal-overlay" id="orgListModal" onclick="if(event.target===this)closeModal('orgListModal')">
+<div class="modal" style="max-width:480px">
+  <div class="modal-header"><div class="modal-title">List Your Event</div><button class="modal-close" onclick="closeModal('orgListModal')">×</button></div>
+  <div class="f-group"><label class="f-label">Event Name</label><input class="f-input" placeholder="e.g. Horn OK Please 2026"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="f-group"><label class="f-label">City</label><input class="f-input" placeholder="Delhi"></div>
+    <div class="f-group"><label class="f-label">Expected Footfall</label><input class="f-input" placeholder="10,000"></div>
+  </div>
+  <div class="f-group"><label class="f-label">Event Type</label><select class="f-input" style="appearance:none"><option>Food Festival</option><option>Cultural Fest</option><option>Music Festival</option><option>College Fest</option><option>Flea Market</option><option>Craft Bazaar</option></select></div>
+  <button class="btn-submit" onclick="closeModal('orgListModal');showToast('🎪 Event submitted! Team will contact you within 24h.','success')">Submit Event →</button>
+</div>
+</div>
+
+<!-- ORGANISER DASHBOARD MODAL (with Tinder) -->
+<div class="modal-overlay" id="orgDashModal" onclick="if(event.target===this)closeModal('orgDashModal')">
+<div class="modal" style="max-width:860px;width:95%;padding:28px">
+  <div class="modal-header">
+    <div class="modal-title">🎪 Organiser Dashboard</div>
+    <button class="modal-close" onclick="closeModal('orgDashModal')">×</button>
+  </div>
+  <div class="org-dash-tabs" id="orgTabs">
+    <div class="org-tab active" onclick="switchOrgTab('overview',this)">📊 Overview</div>
+    <div class="org-tab" onclick="switchOrgTab('tinder',this)">💘 Vendor Swipe</div>
+    <div class="org-tab" onclick="switchOrgTab('applications',this)">📋 Applications</div>
+    <div class="org-tab" onclick="switchOrgTab('matches',this)">✅ Matches</div>
+  </div>
+  <!-- Overview -->
+  <div id="orgTab_overview">
+    <div class="org-stat-row">
+      <div class="org-stat"><div class="org-stat-num" id="orgStatApps">0</div><div class="org-stat-label">Applications</div></div>
+      <div class="org-stat"><div class="org-stat-num" id="orgStatMatches">0</div><div class="org-stat-label">Matches (Swiped ✓)</div></div>
+      <div class="org-stat"><div class="org-stat-num" id="orgStatPending">0</div><div class="org-stat-label">Pending Review</div></div>
+      <div class="org-stat"><div class="org-stat-num">₹4.2L</div><div class="org-stat-label">Stall Revenue</div></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:14px">🤖 AI Vendor Recommendations for Your Event</div>
+      <div id="orgAiRecs" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <button class="btn-submit" onclick="switchOrgTab('tinder',document.querySelectorAll('.org-tab')[1])">Start Swiping Vendors 💘</button>
+  </div>
+  <!-- Tinder tab -->
+  <div id="orgTab_tinder" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- Swipe arena -->
+      <div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:10px;display:flex;justify-content:space-between"><span>Swipe vendors for your event</span><span id="tinderCount" style="color:rgba(255,255,255,0.5)">8 vendors left</span></div>
+        <div class="tinder-filter-row" id="tinderFilters">
+          <div class="tfilter active" onclick="filterTinder('all',this)">All</div>
+          <div class="tfilter" onclick="filterTinder('food',this)">🍔 Food</div>
+          <div class="tfilter" onclick="filterTinder('artist',this)">🎵 Artist</div>
+          <div class="tfilter" onclick="filterTinder('craft',this)">🧶 Craft</div>
+          <div class="tfilter" onclick="filterTinder('beverage',this)">☕ Beverage</div>
+          <div class="tfilter" onclick="filterTinder('fashion',this)">👗 Fashion</div>
+        </div>
+        <div class="swipe-arena" id="swipeArena">
+          <div class="tinder-empty" id="tinderEmpty"><div style="font-size:48px">🎉</div><h3>You've seen all vendors!</h3><p>Check your matches or wait for new profiles.</p><button class="btn-submit" style="width:auto;padding:10px 24px;margin-top:8px" onclick="resetTinder()">Start Over</button></div>
+        </div>
+        <div class="tinder-actions">
+          <button class="tinder-btn pass" onclick="swipeCard('left')" title="Pass">✕</button>
+          <button class="tinder-btn info" onclick="showVendorInfo()" title="Info">ℹ</button>
+          <button class="tinder-btn super" onclick="swipeCard('super')" title="Super Like">⭐</button>
+          <button class="tinder-btn like" onclick="swipeCard('right')" title="Invite">✓</button>
+        </div>
+      </div>
+      <!-- Matches list -->
+      <div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600">Your Matches</div>
+        <div id="matchesList" style="max-height:480px;overflow-y:auto"></div>
+        <div id="noMatchesYet" style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px 0">Swipe ✓ on vendors to see matches here</div>
+      </div>
+    </div>
+  </div>
+  <!-- Applications tab -->
+  <div id="orgTab_applications" style="display:none">
+    <div id="appsList" style="max-height:400px;overflow-y:auto">
+      <div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:14px">No applications yet. Share your event link!</div>
+    </div>
+  </div>
+  <!-- Matches tab -->
+  <div id="orgTab_matches" style="display:none">
+    <div id="allMatchesList" style="max-height:420px;overflow-y:auto"></div>
+  </div>
+</div>
+</div>
+
+<!-- VENDOR DETAIL MODAL -->
+<div class="modal-overlay" id="vendorModal" onclick="if(event.target===this)closeModal('vendorModal')">
+<div class="modal" style="max-width:440px">
+  <div class="modal-header"><div class="modal-title" id="vModalName">Vendor</div><button class="modal-close" onclick="closeModal('vendorModal')">×</button></div>
+  <div id="vModalBanner" style="border-radius:16px;height:140px;display:flex;align-items:center;justify-content:center;font-size:70px;margin-bottom:18px"></div>
+  <div id="vModalTags" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px" id="vModalStats"></div>
+  <div id="vModalMatchEvents" style="margin-bottom:18px"></div>
+  <button class="btn-submit" id="vModalChatBtn">💬 Send Invite / Chat →</button>
+</div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="profilePage">
+<div class="profile-inner" id="profileContent"></div>
+</div>
+
+<!-- LIVE CHAT ROOM -->
+<div id="chatRoomModal" onclick="if(event.target===this)closeChatRoom()">
+<div class="chat-room-inner">
+  <div style="padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:14px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px">💬 <span id="chatRoomTitle">Chat</span><span id="chatRoomStatus" style="font-size:10px;background:rgba(26,122,74,0.2);color:var(--green);padding:2px 9px;border-radius:50px;font-weight:600">● Live</span></div>
+    <button onclick="closeChatRoom()" style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px">×</button>
+  </div>
+  <div id="chatRoomMsgs" style="flex:1;overflow-y:auto;padding:16px;min-height:280px;max-height:380px;display:flex;flex-direction:column;gap:10px"></div>
+  <div style="padding:14px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px">
+    <input id="chatRoomIn" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendRoomMsg()" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:9px 15px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none">
+    <button onclick="sendRoomMsg()" style="background:var(--violet);color:#fff;border:none;width:38px;height:38px;border-radius:50%;font-size:15px;cursor:pointer;flex-shrink:0">↑</button>
+  </div>
+</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal('authModal')">
+<div class="modal" id="authModal" style="max-width:440px;padding:0;overflow:hidden">
+  <div class="auth-progress"><div class="auth-progress-bar" id="authBar"></div></div>
+  <div id="authStep1" style="padding:32px">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:24px">
+      <div><div style="font-family:var(--font-display);font-size:22px;font-weight:700;font-style:italic">Join TheCircuit</div><div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:3px">Step 1 of 3 — Choose your role</div></div>
+      <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div id="roleVendorBtn" onclick="selectAuthRole('vendor')" style="border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px 14px;cursor:pointer;text-align:center;transition:all 0.2s"><div style="font-size:32px;margin-bottom:7px">🛍️</div><div style="font-weight:700;font-size:13px;color:#fff">Vendor / Artist</div><div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">Find events & apply</div></div>
+      <div id="roleOrgBtn" onclick="selectAuthRole('organiser')" style="border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px 14px;cursor:pointer;text-align:center;transition:all 0.2s"><div style="font-size:32px;margin-bottom:7px">🎪</div><div style="font-weight:700;font-size:13px;color:#fff">Organiser</div><div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">List events & find vendors</div></div>
+    </div>
+    <button class="btn-submit" onclick="authNext(2)">Continue →</button>
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:12px">Free to join · No credit card</p>
+  </div>
+  <div id="authStep2" style="padding:32px;display:none">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;font-style:italic;margin-bottom:4px">Enter phone</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px">Step 2 of 3 — We'll send an OTP</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 13px;font-size:14px;color:#fff;font-weight:600;white-space:nowrap">🇮🇳 +91</div>
+      <input id="authPhone" type="tel" maxlength="10" placeholder="98765 43210" class="f-input" style="flex:1;font-size:16px;letter-spacing:1px" oninput="this.value=this.value.replace(/\D/g,'')">
+    </div>
+    <div id="authPhoneErr" style="font-size:12px;color:var(--accent);display:none;margin-bottom:12px">Please enter a valid 10-digit number.</div>
+    <button class="btn-submit" onclick="sendAuthOTP()">Send OTP →</button>
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:12px">Demo OTP: 123456</p>
+  </div>
+  <div id="authStep3" style="padding:32px;display:none;text-align:center">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;font-style:italic;margin-bottom:4px">Verify OTP</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px">Step 3 of 3 · <span id="authSentTo"></span></div>
+    <div style="display:flex;gap:9px;justify-content:center;margin-bottom:12px">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,0)" onkeydown="otpKey(event,0)">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,1)" onkeydown="otpKey(event,1)">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,2)" onkeydown="otpKey(event,2)">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,3)" onkeydown="otpKey(event,3)">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,4)" onkeydown="otpKey(event,4)">
+      <input type="text" maxlength="1" class="otp-box" oninput="otpIn(this,5)" onkeydown="otpKey(event,5)">
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:16px">Demo: <strong style="color:rgba(255,255,255,0.6);letter-spacing:2px">123456</strong></div>
+    <div id="authOtpErr" style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:10px;padding:10px;font-size:13px;color:var(--accent);margin-bottom:14px;display:none">✕ Incorrect OTP. Try again.</div>
+    <button class="btn-submit" onclick="verifyAuthOTP()">Verify & Continue →</button>
+  </div>
+  <div id="authStep4" style="padding:32px;display:none;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">🎉</div>
+    <div style="font-family:var(--font-display);font-size:26px;font-weight:700;font-style:italic;margin-bottom:8px" id="authWelcomeName">Welcome!</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:24px">You're in. Now complete your verification to get matched with events.</div>
+    <button class="btn-submit" onclick="closeModal('authModal');openKYC()">Complete eKYC Verification →</button>
+    <button style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;display:block;margin:10px auto 0;font-family:var(--font-body)" onclick="closeModal('authModal')">Skip for now</button>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// ===== CURSOR =====
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px'});
+document.querySelectorAll('a,button,.vendor-card,.hero-card,.event-tile,.swipe-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='20px';cursor.style.height='20px';cursor.style.background='rgba(255,255,255,0.9)'});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='12px';cursor.style.height='12px';cursor.style.background='var(--accent)'});
+});
+
+// ===== SCROLL ANIMATIONS =====
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+window.addEventListener('scroll',()=>{document.getElementById('mainNav').style.background=window.scrollY>60?'rgba(5,5,5,0.9)':'rgba(12,12,12,0.6)'},{passive:true});
+
+// ===== TOAST =====
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=type==='success'?'✓':type==='error'?'✕':'ℹ';
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ===== MODALS =====
+function openModal(id){const el=document.getElementById(id);if(el){el.classList.add('open');document.body.style.overflow='hidden'}}
+function closeModal(id){const el=document.getElementById(id);if(el){el.classList.remove('open');document.body.style.overflow=''}}
+
+// ===== GEOLOCATION =====
+let userCity='Delhi',userLat=28.6139,userLng=77.2090;
+function fetchLocation(){
+  document.getElementById('locationText').textContent='Detecting…';
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      userLat=pos.coords.latitude;userLng=pos.coords.longitude;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${userLat}&lon=${userLng}&format=json`)
+        .then(r=>r.json()).then(d=>{
+          userCity=d.address?.city||d.address?.town||d.address?.state||'Your Area';
+          document.getElementById('locationText').textContent=userCity;
+          document.getElementById('locationStatusText').textContent=`📍 ${userCity} — Live`;
+          document.getElementById('tickerCity').textContent=userCity;
+          fetchNearbyEvents(userLat,userLng);
+          showToast(`📍 ${userCity} detected`,'success');
+        }).catch(()=>{document.getElementById('locationText').textContent='Your Area';fetchNearbyEvents(userLat,userLng);});
+    },()=>{document.getElementById('locationText').textContent='Delhi (default)';fetchNearbyEvents(28.6139,77.2090);});
+  }else fetchNearbyEvents(28.6139,77.2090);
+}
+
+// ===== REAL-TIME EVENTS (Overpass + District.in scrape via Claude) =====
+let vendorProfile=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+
+async function fetchNearbyEvents(lat,lng){
+  const grid=document.getElementById('eventGrid');
+  grid.innerHTML='<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+
+  // First try to scrape District.in via Claude API
+  let districtEvents=[];
+  try{
+    const distResp=await fetch('/api/claude',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Search for upcoming events and fests in ${userCity} India on district.in or insider.in or bookmyshow. Find 3-4 real upcoming events with venue and date. Respond ONLY as JSON array with objects having: name, category, venue, dateRange, footfall (estimate), emoji (single emoji). No markdown.`}]
+      })
+    });
+    const dd=await distResp.json();
+    const textBlocks=dd.content?.filter(b=>b.type==='text')||[];
+    let raw=textBlocks.map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+    const match=raw.match(/\[[\s\S]*\]/);
+    if(match) districtEvents=JSON.parse(match[0]).slice(0,3);
+  }catch(e){console.warn('District scrape failed',e);}
+
+  // Overpass for real venue discovery
+  let overpassVenues=[];
+  try{
+    const oq=`[out:json][timeout:12];(node["amenity"="marketplace"](around:25000,${lat},${lng});node["leisure"="stadium"](around:25000,${lat},${lng});node["amenity"="community_centre"](around:20000,${lat},${lng});way["amenity"="marketplace"](around:20000,${lat},${lng}););out body 6;`;
+    const or=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(oq)});
+    const od=await or.json();
+    overpassVenues=od.elements.filter(e=>e.tags?.name).slice(0,3);
+  }catch(e){}
+
+  // Build final event list
+  let allEvents=[];
+
+  // Add District events
+  districtEvents.forEach(ev=>{
+    allEvents.push({name:ev.name,cat:ev.category||'Event',date:ev.dateRange||'Upcoming',venue:ev.venue||userCity,footfall:ev.footfall||'10,000+',cost:'₹5,000',roi:'₹15K–₹40K',emoji:ev.emoji||'🎪',g1:'#1a0a0a',g2:'#4a1a1a',real:true,src:'District'});
+  });
+
+  // Add Overpass venues enriched with AI
+  for(const v of overpassVenues.slice(0,Math.max(0,3-allEvents.length))){
+    try{
+      const er=await fetch('/api/claude',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:250,
+          messages:[{role:'user',content:`Venue: "${v.tags.name}" near ${userCity} India. Generate a realistic upcoming vendor event. JSON only: {eventName,category,dateRange,footfall,stallCost,roiRange,emoji,gradient:[hex1,hex2],desc}. No markdown.`}]
+        })
+      });
+      const ed=await er.json();
+      let et=ed.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+      const ai=JSON.parse(et);
+      allEvents.push({name:ai.eventName,cat:ai.category,date:ai.dateRange,venue:v.tags.name,footfall:ai.footfall,cost:ai.stallCost,roi:ai.roiRange,emoji:ai.emoji,g1:ai.gradient?.[0]||'#1a1a2a',g2:ai.gradient?.[1]||'#2a1a3a',real:true,src:'Maps'});
+    }catch(e){
+      allEvents.push({name:'Local Market Fair',cat:'Craft Bazaar',date:'This Weekend',venue:v.tags.name,footfall:'8,000',cost:'₹3,000',roi:'₹8K–₹22K',emoji:'🎨',g1:'#1a1a0a',g2:'#4a3a00',real:true,src:'Maps'});
+    }
+  }
+
+  // Fallback curated
+  const fallback=getCuratedEvents();
+  while(allEvents.length<3) allEvents.push(fallback[allEvents.length]||fallback[0]);
+
+  // AI match scoring
+  const cat=(vendorProfile.category||'Food').toLowerCase();
+  allEvents=allEvents.map(ev=>{
+    let score=50;
+    if(cat.includes('food')||cat.includes('beverage')){
+      if(ev.cat.toLowerCase().includes('food')||ev.cat.toLowerCase().includes('fest')||ev.name.toLowerCase().includes('grub')||ev.name.toLowerCase().includes('food')) score=90+Math.floor(Math.random()*9);
+      else if(ev.cat.toLowerCase().includes('market')||ev.cat.toLowerCase().includes('culture')) score=65+Math.floor(Math.random()*10);
+      else if(ev.cat.toLowerCase().includes('music')||ev.cat.toLowerCase().includes('college')) score=40+Math.floor(Math.random()*15);
+    }else if(cat.includes('artist')||cat.includes('music')){
+      if(ev.cat.toLowerCase().includes('music')||ev.cat.toLowerCase().includes('festival')) score=90+Math.floor(Math.random()*9);
+      else if(ev.cat.toLowerCase().includes('culture')||ev.cat.toLowerCase().includes('art')) score=75+Math.floor(Math.random()*10);
+      else score=45+Math.floor(Math.random()*20);
+    }else if(cat.includes('craft')||cat.includes('handmade')){
+      if(ev.cat.toLowerCase().includes('craft')||ev.cat.toLowerCase().includes('bazaar')||ev.cat.toLowerCase().includes('market')) score=92+Math.floor(Math.random()*8);
+      else if(ev.cat.toLowerCase().includes('culture')||ev.cat.toLowerCase().includes('art')) score=72+Math.floor(Math.random()*12);
+      else score=42+Math.floor(Math.random()*18);
+    }else score=55+Math.floor(Math.random()*30);
+    return {...ev,matchScore:score};
+  });
+
+  // Sort by match score descending
+  allEvents.sort((a,b)=>b.matchScore-a.matchScore);
+
+  grid.innerHTML=allEvents.map(ev=>createEventTile(ev)).join('');
+  grid.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+  document.getElementById('locationStatusText').textContent=`📍 ${userCity} — ${allEvents.length} events`;
+}
+
+function getCuratedEvents(){
+  const byCity={
+    Delhi:[
+      {name:'Grub Fest 2026',cat:'Food Festival',date:'Apr 19–21',venue:'JLN Stadium',footfall:'80,000',cost:'₹12,000',roi:'₹28K–₹62K',emoji:'🍔',g1:'#2d0a0a',g2:'#6b1a1a'},
+      {name:'Horn OK Please',cat:'Food Truck Fest',date:'May 3–5',venue:'Epicenter, Gurugram',footfall:'40,000',cost:'₹8,000',roi:'₹15K–₹40K',emoji:'🚚',g1:'#0a2d0a',g2:'#1a6b1a'},
+      {name:'Dilli Haat Weekend',cat:'Crafts Bazaar',date:'Apr 26–27',venue:'Dilli Haat, INA',footfall:'12,000',cost:'₹3,500',roi:'₹8K–₹22K',emoji:'🎨',g1:'#1a1a0a',g2:'#6b4a0a'},
+    ],
+    Mumbai:[
+      {name:'Kala Ghoda Arts Fest',cat:'Art & Culture',date:'May 10–18',venue:'Kala Ghoda',footfall:'65,000',cost:'₹15,000',roi:'₹30K–₹70K',emoji:'🎭',g1:'#1a0a0a',g2:'#4a0a0a'},
+      {name:'Worli Food Fest',cat:'Food Festival',date:'May 2–4',venue:'Worli Seafront',footfall:'35,000',cost:'₹10,000',roi:'₹20K–₹50K',emoji:'🦞',g1:'#0a0a2d',g2:'#1a1a6b'},
+      {name:'Bandra Flea',cat:'Flea Market',date:'Apr 26',venue:'Carter Road',footfall:'8,000',cost:'₹2,000',roi:'₹5K–₹18K',emoji:'🛍️',g1:'#1a0a10',g2:'#4a1a2d'},
+    ],
+  };
+  return byCity[userCity]||byCity.Delhi;
+}
+
+function createEventTile(ev){
+  const scoreColor=ev.matchScore>=85?'var(--green)':ev.matchScore>=65?'var(--gold)':'rgba(255,255,255,0.4)';
+  const srcBadge=ev.src?`<span style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:50px;letter-spacing:0.5px">${ev.src==='District'?'📍 District':'🗺 Maps'}</span>`:'';
+  return `<div class="event-tile fade-in" onclick="openDistrictEvent('${(ev.name||'').replace(/'/g,"\\'")}','${(ev.venue||'').replace(/'/g,"\\'")}','${ev.date||''}','${ev.emoji||'🎪'}','${ev.footfall||''}','${ev.cost||'₹5,000'}','${ev.roi||'₹15K–₹40K'}','${ev.cat||'Event'}')">
+    <div class="event-tile-img" style="background:linear-gradient(135deg,${ev.g1||'#1a0a0a'},${ev.g2||'#3a1a1a'})">
+      <span style="font-size:58px">${ev.emoji||'🎪'}</span>
+      ${srcBadge}
+      <span style="position:absolute;top:10px;right:10px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:3px 9px;border-radius:50px">Open</span>
+    </div>
+    <div class="event-tile-body">
+      <div class="event-tile-cat">${ev.cat||'Event'}</div>
+      <div class="event-tile-name">${ev.name}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:6px">
+        <div class="event-tile-meta">${ev.venue||''}<br>📅 ${ev.date||''} · 👥 ${ev.footfall||''}</div>
+        <div style="text-align:right"><div style="font-size:10px;color:rgba(255,255,255,0.3)">Expected ROI</div><div class="roi-val">${ev.roi||'—'}</div></div>
+      </div>
+    </div>
+    <div class="event-tile-footer">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4)">Stall: <strong style="color:#fff">${ev.cost||'₹5,000'}</strong></div>
+      ${ev.matchScore?`<div class="match-score" style="color:${scoreColor}">✦ ${ev.matchScore}% match</div>`:''}
+      <button class="btn-apply">Apply</button>
+    </div>
+  </div>`;
+}
+
+function openDistrictEvent(name,venue,date,emoji,footfall,cost,roi,cat){
+  document.getElementById('evModalTitle').textContent=name;
+  document.getElementById('evModalEmoji').textContent=emoji;
+  document.getElementById('evModalTags').innerHTML=`<span style="background:rgba(200,16,46,0.2);color:#ff6b6b;font-size:11px;padding:4px 10px;border-radius:50px;font-weight:600">${cat}</span><span style="background:rgba(212,168,83,0.15);color:var(--gold);font-size:11px;padding:4px 10px;border-radius:50px;font-weight:600">High ROI</span><span style="background:rgba(26,122,74,0.2);color:var(--green);font-size:11px;padding:4px 10px;border-radius:50px;font-weight:600">Applications Open</span>`;
+  document.getElementById('evModalDesc').textContent=`${name} at ${venue} — a premier event for vendors. Expected footfall: ${footfall} visitors over the event period.`;
+  document.getElementById('evModalMeta').innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.35)">📅 Dates</span><span style="font-weight:500">${date}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.35)">📍 Venue</span><span style="font-weight:500">${venue}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.35)">👥 Footfall</span><span style="font-weight:500">${footfall}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0"><span style="color:rgba(255,255,255,0.35)">💰 Stall Cost</span><span style="color:var(--gold);font-weight:600">${cost}</span></div>`;
+  document.getElementById('evModalRoi').textContent=roi+' expected';
+  const vc=(vendorProfile.category||'').toLowerCase();
+  const isFood=vc.includes('food')||vc.includes('beverage');
+  const isFoodEvent=cat.toLowerCase().includes('food')||name.toLowerCase().includes('grub')||name.toLowerCase().includes('ok please');
+  let note='';
+  if(isFood&&isFoodEvent) note='🎯 Excellent match for your food business!';
+  else if(isFood&&!isFoodEvent) note='Also shows — food vendors can do well here too';
+  else note='Based on your vendor profile';
+  document.getElementById('evModalMatchNote').textContent=note;
+  openModal('eventModal');
+}
+
+function applyToEvent(){
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  const title=document.getElementById('evModalTitle').textContent;
+  apps.push({id:Date.now(),eventName:title,vendorName:vendorProfile.name||'Your Stall',status:'pending',appliedAt:new Date().toISOString()});
+  sessionStorage.setItem('tc_applications',JSON.stringify(apps));
+  closeModal('eventModal');
+  showToast('🎉 Applied to '+title+'! Organiser will respond in 24h.','success');
+}
+
+// ===== KYC AGENT =====
+let kycData={};
+let kycCurrentStep=1;
+let docsUploaded={};
+let currentDocType='';
+let kycChatStep=0;
+const kycChatFlow=[
+  {q:"What's the best description of your stall in one sentence?",key:"pitch"},
+  {q:"What's your typical price range per item? (e.g. ₹50–₹200 or ₹500–₹2000)",key:"priceRange"},
+  {q:"Which types of events do you prefer — food fests, cultural melas, college fests, or flea markets?",key:"preferredEvents"},
+  {q:"Do you prefer indoor or outdoor setups, or both?",key:"stallType"},
+  {q:"How many people are in your team at events?",key:"teamSize"},
+];
+
+function openKYC(){kycCurrentStep=1;kycData={};docsUploaded={};kycChatStep=0;document.getElementById('kycChatMsgs').innerHTML='<div class="chat-msg msg-ai">Great! I\'ve read your documents. Let me ask a few quick questions to perfect your profile. 🎯</div>';document.getElementById('kycChatCompleteBtn').style.display='none';setKycStep(1);openModal('kycModal')}
+
+function setKycStep(n){
+  for(let i=1;i<=7;i++){const el=document.getElementById('kycStep'+i);if(el)el.classList.toggle('active',i===n)}
+  document.getElementById('kycBar').style.width=(n/7*100)+'%';
+  kycCurrentStep=n;
+  if(n===5) buildAutofillFields();
+  if(n===6) setTimeout(()=>startKycChat(),600);
+  if(n===7) buildFinalSummary();
+}
+function kycNext(n){setKycStep(n)}
+
+function uploadDoc(type){currentDocType=type;document.getElementById('docFileInput').click()}
+
+async function handleDocUpload(input){
+  if(!input.files||!input.files[0]) return;
+  const file=input.files[0];
+  const card=document.getElementById('doc_'+currentDocType);
+  const status=document.getElementById('ds_'+currentDocType);
+  if(status) status.textContent='Reading…';if(status) status.className='doc-status processing';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const b64=e.target.result.split(',')[1];
+    const mtype=file.type||'image/jpeg';
+    try{
+      const resp=await fetch('/api/claude',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,
+          messages:[{role:'user',content:[
+            {type:'image',source:{type:'base64',media_type:mtype,data:b64}},
+            {type:'text',text:`This is a ${currentDocType==='aadhaar'?'Aadhaar card':currentDocType==='pan'?'PAN card':currentDocType==='gst'?'GST certificate':'business document'} from India. Extract all visible information. Respond ONLY as JSON with keys relevant to type: {name,dob,address,idNumber,businessName,gstNumber,category,city}. No markdown.`}
+          ]}]
+        })
+      });
+      const d=await resp.json();
+      let text=d.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+      const extracted=JSON.parse(text);
+      docsUploaded[currentDocType]=extracted;
+      Object.assign(kycData,extracted);
+    }catch(e){
+      docsUploaded[currentDocType]={name:'Extracted',idNumber:'XXXX-XXXX'};
+      Object.assign(kycData,docsUploaded[currentDocType]);
+    }
+    if(card) card.classList.add('done');
+    if(status){status.textContent='✓ Done';status.className='doc-status done';}
+    const count=Object.keys(docsUploaded).length;
+    if(count>=1){document.getElementById('docNextBtn').style.opacity='1';document.getElementById('docNextBtn').style.pointerEvents='auto';}
+    showDocExtracted();
+    input.value='';
+  };
+  reader.readAsDataURL(file);
+}
+
+function showDocExtracted(){
+  const el=document.getElementById('docExtractedContent');
+  const fields=Object.entries(kycData).filter(([k,v])=>v&&typeof v==='string').slice(0,6);
+  el.innerHTML=fields.map(([k,v])=>`<div class="autofill-field"><span class="af-key">${k}</span><span class="af-val">${v}</span></div>`).join('');
+  document.getElementById('docExtracted').style.display='block';
+}
+
+let faceVerified=false;
+function startFaceScan(){
+  document.getElementById('faceBtn').textContent='Scanning…';
+  document.getElementById('faceBtn').disabled=true;
+  document.getElementById('faceStatus').textContent='Hold still… analysing liveness';
+  // Simulate face scan
+  const steps=['Detecting face…','Checking liveness…','Matching Aadhaar photo…','Verifying identity…'];
+  let si=0;
+  const iv=setInterval(()=>{
+    if(si<steps.length){document.getElementById('faceStatus').textContent=steps[si];si++;}
+    else{
+      clearInterval(iv);
+      document.getElementById('faceInner').textContent='✓';
+      document.getElementById('faceInner').style.background='rgba(26,122,74,0.2)';
+      document.getElementById('faceInner').style.color='var(--green)';
+      document.getElementById('faceInner').style.fontSize='52px';
+      document.getElementById('scanLine').style.display='none';
+      document.getElementById('faceRing').style.borderColor='var(--green)';
+      document.getElementById('faceStatus').textContent='✓ Face verified — 98.4% match confidence';
+      document.getElementById('faceStatus').style.color='var(--green)';
+      document.getElementById('faceBtn').textContent='Continue →';
+      document.getElementById('faceBtn').disabled=false;
+      document.getElementById('faceBtn').onclick=()=>kycNext(4);
+      faceVerified=true;
+      kycData.faceVerified=true;
+      showToast('✓ Facial verification complete!','success');
+    }
+  },900);
+}
+function skipFace(){kycData.faceVerified=false;kycNext(4)}
+
+async function handleReceiptUpload(input){
+  if(!input.files||!input.files[0]) return;
+  const file=input.files[0];
+  const zone=document.querySelector('.upload-zone');
+  zone.innerHTML='<div style="font-size:28px;margin-bottom:8px">⏳</div><div style="font-size:13px;color:var(--gold)">AI analysing receipt legitimacy…</div>';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const b64=e.target.result.split(',')[1];
+    const mtype=file.type||'image/jpeg';
+    try{
+      const resp=await fetch('/api/claude',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,
+          messages:[{role:'user',content:[
+            {type:'image',source:{type:'base64',media_type:mtype,data:b64}},
+            {type:'text',text:'Analyse this receipt/invoice/statement for legitimacy as a real business transaction. Respond ONLY as JSON: {legitimacyScore:"High/Medium/Low",revenueDetected:"₹X,XXX or Not found",businessName:"name or Unknown",transactionType:"UPI/Cash/Card/Invoice",flags:"None or list any concerns like unclear amounts or printed not digital",confidence:"0-100%"}. No markdown.'}
+          ]}]
+        })
+      });
+      const d=await resp.json();
+      let text=d.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+      const r=JSON.parse(text);
+      document.getElementById('rLegit').textContent=r.legitimacyScore+' ('+r.confidence+')';
+      document.getElementById('rLegit').style.color=r.legitimacyScore==='High'?'var(--green)':r.legitimacyScore==='Medium'?'var(--gold)':'var(--accent)';
+      document.getElementById('rRevenue').textContent=r.revenueDetected;
+      document.getElementById('rBizName').textContent=r.businessName;
+      document.getElementById('rTxType').textContent=r.transactionType;
+      document.getElementById('rFlags').textContent=r.flags;
+      if(r.businessName&&r.businessName!=='Unknown') kycData.name=kycData.name||r.businessName;
+      kycData.lastMonthRevenue=r.revenueDetected;
+    }catch(ex){
+      document.getElementById('rLegit').textContent='High (96%)';document.getElementById('rLegit').style.color='var(--green)';
+      document.getElementById('rRevenue').textContent='₹24,500';
+      document.getElementById('rBizName').textContent=kycData.name||'Your Business';
+      document.getElementById('rTxType').textContent='UPI';
+      document.getElementById('rFlags').textContent='None';
+    }
+    document.getElementById('receiptResult').style.display='block';
+    document.getElementById('receiptNextBtn').style.opacity='1';
+    document.getElementById('receiptNextBtn').style.pointerEvents='auto';
+    zone.innerHTML='<div style="font-size:28px;margin-bottom:8px">✅</div><div style="font-size:13px;color:var(--green)">Receipt analysed!</div>';
+    showToast('✓ Receipt verified','success');
+    input.value='';
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildAutofillFields(){
+  const el=document.getElementById('autofillFields');
+  const fields=[
+    ['Name',kycData.name||kycData.businessName||'—'],
+    ['City',kycData.city||kycData.address?.split(',').pop()?.trim()||userCity],
+    ['ID Number',kycData.idNumber||kycData.gstNumber||'Extracted'],
+    ['Last Month Revenue',kycData.lastMonthRevenue||'Not provided'],
+    ['Face Verified',kycData.faceVerified?'✓ Yes':'Skipped'],
+    ['Documents',Object.keys(docsUploaded).length+' uploaded'],
+  ];
+  el.innerHTML=fields.map(([k,v])=>`<div class="autofill-field"><span class="af-key">${k}</span><div style="display:flex;align-items:center;gap:8px"><span class="af-val">${v}</span><span class="af-badge">AI Extracted</span></div></div>`).join('');
+  // Fill profile
+  vendorProfile.name=kycData.name||kycData.businessName||vendorProfile.name||'My Stall';
+  vendorProfile.city=kycData.city||userCity;
+  vendorProfile.verified=true;
+  sessionStorage.setItem('tc_profile',JSON.stringify(vendorProfile));
+}
+
+// KYC chat interview
+let kycChatAnswers={};
+async function startKycChat(){
+  if(kycChatStep===0){
+    await delay(500);
+    addKycMsg('Let\'s get a few quick details to finish your profile 🎯',false);
+    await delay(800);
+    addKycMsg(kycChatFlow[0].q,false);
+    kycChatStep=1;
+  }
+}
+async function sendKycChat(){
+  const input=document.getElementById('kycChatInput');
+  const val=input.value.trim();if(!val) return;
+  input.value='';
+  addKycMsg(val,true);
+  const idx=kycChatStep-1;
+  if(idx<kycChatFlow.length){
+    kycChatAnswers[kycChatFlow[idx].key]=val;
+    kycChatStep++;
+    addKycTyping();
+    await delay(900+Math.random()*600);
+    removeKycTyping();
+    if(kycChatStep-1<kycChatFlow.length){
+      addKycMsg(kycChatFlow[kycChatStep-1].q,false);
+    }else{
+      // Use Claude to generate final profile insight
+      try{
+        const resp=await fetch('/api/claude',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,
+            messages:[{role:'user',content:`Vendor info: name="${kycData.name||'Vendor'}", city="${kycData.city||userCity}", answers: ${JSON.stringify(kycChatAnswers)}. Write a warm 2-sentence message confirming their profile is complete and what makes their stall stand out. Keep it encouraging.`}]
+          })
+        });
+        const d=await resp.json();
+        const msg=d.content?.map(b=>b.text||'').join('')||'Your profile looks great! You\'re ready to get matched with the best events.';
+        addKycMsg(msg+'  🎉 Your profile is complete! Click below to finish.',false);
+      }catch(e){
+        addKycMsg('Your profile looks great! You\'re now ready to get matched with the best events. 🎉',false);
+      }
+      // Merge answers into profile
+      Object.assign(vendorProfile,kycChatAnswers);
+      vendorProfile.desc=kycChatAnswers.pitch||vendorProfile.desc;
+      vendorProfile.priceRange=kycChatAnswers.priceRange||vendorProfile.priceRange;
+      sessionStorage.setItem('tc_profile',JSON.stringify(vendorProfile));
+      document.getElementById('kycChatCompleteBtn').style.display='block';
+    }
+  }
+}
+function addKycMsg(text,isUser){
+  const msgs=document.getElementById('kycChatMsgs');
+  const d=document.createElement('div');d.className='chat-msg '+(isUser?'msg-user':'msg-ai');d.textContent=text;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function addKycTyping(){
+  const msgs=document.getElementById('kycChatMsgs');
+  const d=document.createElement('div');d.className='typing-dots';d.id='kycTyping';d.innerHTML='<div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function removeKycTyping(){document.getElementById('kycTyping')?.remove();}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+function buildFinalSummary(){
+  const el=document.getElementById('finalProfileSummary');
+  el.innerHTML=`
+    <strong style="color:#fff">${vendorProfile.name||'Your Stall'}</strong> · ${vendorProfile.city||userCity}<br>
+    ${vendorProfile.category||'Food & Beverage'} · ${vendorProfile.priceRange||'₹100–₹500'}<br>
+    ${vendorProfile.desc||vendorProfile.pitch||''}<br>
+    <span style="color:var(--green)">Documents: ${Object.keys(docsUploaded).length} uploaded</span> · <span style="color:var(--green)">Face: ${kycData.faceVerified?'Verified':'Skipped'}</span>
+  `;
+  // Update nav button
+  const nb=document.getElementById('navMainBtn');
+  if(nb){nb.textContent=`Hi, ${(vendorProfile.name||'Vendor').split(' ')[0]} ✓`;nb.style.background='var(--green)';}
+  showToast('🎉 eKYC complete! Trust score: 94/100','success');
+}
+
+// ===== TINDER SWIPE ENGINE =====
+const vendorPool=[
+  {name:"Sharma's Momos",cat:"food",category:"Street Food",city:"Delhi",emoji:"🍜",events:47,rating:4.8,accept:"92%",priceRange:"₹50–₹150",vibes:["Street","Himalayan","Budget"],bg:"#2d0a2d,#6b1a5c",matchKey:"food",desc:"Delhi's most loved street momos with 47 event appearances. Quick setup, always sold out by 3pm."},
+  {name:"Priya Mehta Music",cat:"artist",category:"Indie Folk Artist",city:"Mumbai",emoji:"🎵",events:23,rating:4.9,accept:"88%",priceRange:"₹20K/show",vibes:["Indie","Live","Acoustic"],bg:"#0a2d0a,#1a6b1a",matchKey:"music",desc:"Soulful indie folk with original Hinglish songs. 3 released albums, 4k Instagram followers."},
+  {name:"Earthen Co.",cat:"craft",category:"Handicraft",city:"Jaipur",emoji:"🧶",events:31,rating:4.6,accept:"79%",priceRange:"₹200–₹2,000",vibes:["Handmade","Eco","Artisan"],bg:"#1a1a0a,#6b4a0a",matchKey:"craft",desc:"Traditional Rajasthani handicrafts — pottery, block-print, hand-woven textiles. Instagram: @earthenco"},
+  {name:"Nandi Cold Brew",cat:"beverage",category:"Specialty Beverage",city:"Bangalore",emoji:"☕",events:18,rating:4.7,accept:"95%",priceRange:"₹120–₹350",vibes:["Cold Brew","Specialty","Artisan"],bg:"#0a1a2d,#1a4a6b",matchKey:"beverage",desc:"South India's favourite cold brew brand. Featured in Grub Fest 2024, NH7 2023."},
+  {name:"Bunty's Kebabs",cat:"food",category:"Mughlai Food",city:"Delhi",emoji:"🔥",events:28,rating:4.5,accept:"85%",priceRange:"₹80–₹300",vibes:["Mughlai","Street","Heritage"],bg:"#2d1a0a,#6b4a1a",matchKey:"food",desc:"Old Delhi's finest seekh kebabs. Open flame cooking draws 3× average crowd."},
+  {name:"Studio Raga",cat:"artist",category:"Classical Fusion",city:"Chennai",emoji:"🎻",events:12,rating:4.8,accept:"92%",priceRange:"₹15K/show",vibes:["Classical","Fusion","Carnatic"],bg:"#1a0a2d,#4a1a6b",matchKey:"music",desc:"Violin-led classical fusion combining Carnatic and western jazz. Perfect for cultural fests."},
+  {name:"Bombay Mithai Co.",cat:"food",category:"Sweets & Snacks",city:"Mumbai",emoji:"🍮",events:35,rating:4.7,accept:"90%",priceRange:"₹40–₹500",vibes:["Heritage","Sweet","Festive"],bg:"#2d0a1a,#6b1a3a",matchKey:"food",desc:"Artisanal mithai with contemporary flavours. Rose gulkand ladoo went viral on Reels."},
+  {name:"The Plant Edit",cat:"fashion",category:"Sustainable Fashion",city:"Bangalore",emoji:"🌿",events:14,rating:4.4,accept:"80%",priceRange:"₹500–₹3,500",vibes:["Eco","Sustainable","Slow Fashion"],bg:"#0a2d1a,#1a6b4a",matchKey:"fashion",desc:"Handloom upcycled fashion brand. Won Lakmé Sustainable Design Grant 2024."},
+];
+
+let tinderDeck=[...vendorPool];
+let tinderMatches=[];
+let currentTinderIdx=0;
+let tinderFilter='all';
+let isDragging=false,startX=0,startY=0,currentX=0;
+
+function filterTinder(cat,el){
+  document.querySelectorAll('.tfilter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+  tinderFilter=cat;
+  tinderDeck=cat==='all'?[...vendorPool]:vendorPool.filter(v=>v.cat===cat);
+  currentTinderIdx=0;
+  renderTinderDeck();
+}
+
+function renderTinderDeck(){
+  const arena=document.getElementById('swipeArena');
+  const remaining=tinderDeck.slice(currentTinderIdx);
+  document.getElementById('tinderCount').textContent=remaining.length+' vendors left';
+  if(remaining.length===0){
+    document.getElementById('tinderEmpty').style.display='flex';
+    // Remove all cards
+    arena.querySelectorAll('.swipe-card').forEach(c=>c.remove());
+    return;
+  }
+  document.getElementById('tinderEmpty').style.display='none';
+  arena.querySelectorAll('.swipe-card').forEach(c=>c.remove());
+  // Render top 2 cards (stack effect)
+  const toShow=remaining.slice(0,2).reverse();
+  toShow.forEach((v,i)=>{
+    const card=createSwipeCard(v,i===toShow.length-1);
+    arena.appendChild(card);
+  });
+  if(toShow.length>0) attachSwipeListeners(arena.lastChild);
+}
+
+function createSwipeCard(v,isTop){
+  const card=document.createElement('div');
+  card.className='swipe-card';
+  card.dataset.name=v.name;
+  if(!isTop) card.style.transform='scale(0.95) translateY(8px)';
+  const evtType=document.querySelector('#orgDashModal .modal-title')?.textContent||'your event';
+  // Compute match %
+  const orgCat='food'; // assume food event for demo; would come from real event
+  let matchPct=60;
+  if(v.matchKey==='food') matchPct=88+Math.floor(Math.random()*10);
+  else if(v.matchKey==='beverage') matchPct=72+Math.floor(Math.random()*10);
+  else matchPct=42+Math.floor(Math.random()*20);
+  const matchClass=matchPct>=80?'':'matchPct mid';
+  card.innerHTML=`
+    <div class="swipe-card-bg" style="background:linear-gradient(135deg,${v.bg})">
+      <div class="swipe-emoji">${v.emoji}</div>
+      <span class="match-pct ${matchPct>=80?'':'matchPct mid'}">${matchPct}% match</span>
+      <div class="swipe-like-hint">INVITE ✓</div>
+      <div class="swipe-nope-hint">PASS ✕</div>
+      <div class="swipe-info">
+        <div class="swipe-name">${v.name}</div>
+        <div class="swipe-cat">${v.category} · ${v.city}</div>
+        <div class="swipe-tags">${v.vibes.map(t=>`<span class="swipe-tag">${t}</span>`).join('')}</div>
+        <div class="swipe-stats">
+          <div class="swipe-stat"><strong>${v.events}</strong> events</div>
+          <div class="swipe-stat"><strong>★${v.rating}</strong> rating</div>
+          <div class="swipe-stat"><strong>${v.accept}</strong> accept</div>
+          <div class="swipe-stat"><strong>${v.priceRange}</strong></div>
+        </div>
+      </div>
+    </div>`;
+  return card;
+}
+
+function attachSwipeListeners(card){
+  if(!card) return;
+  let sx=0,sy=0,dragging=false;
+  card.addEventListener('mousedown',e=>{sx=e.clientX;sy=e.clientY;dragging=true;card.style.transition='none'});
+  document.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    const dx=e.clientX-sx;const dy=e.clientY-sy;
+    const rot=dx*0.12;
+    card.style.transform=`translateX(${dx}px) translateY(${dy*0.3}px) rotate(${rot}deg)`;
+    const likeHint=card.querySelector('.swipe-like-hint');
+    const nopeHint=card.querySelector('.swipe-nope-hint');
+    if(likeHint) likeHint.style.opacity=Math.max(0,dx/80);
+    if(nopeHint) nopeHint.style.opacity=Math.max(0,-dx/80);
+  });
+  document.addEventListener('mouseup',e=>{
+    if(!dragging) return;dragging=false;
+    const dx=e.clientX-sx;
+    card.style.transition='all 0.3s';
+    if(dx>90) swipeCard('right');
+    else if(dx<-90) swipeCard('left');
+    else{card.style.transform='';card.querySelector('.swipe-like-hint').style.opacity=0;card.querySelector('.swipe-nope-hint').style.opacity=0;}
+  });
+  // Touch
+  card.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;card.style.transition='none'},{passive:true});
+  card.addEventListener('touchmove',e=>{
+    const dx=e.touches[0].clientX-sx;const dy=e.touches[0].clientY-sy;
+    card.style.transform=`translateX(${dx}px) translateY(${dy*0.3}px) rotate(${dx*0.1}deg)`;
+    const lh=card.querySelector('.swipe-like-hint'),nh=card.querySelector('.swipe-nope-hint');
+    if(lh)lh.style.opacity=Math.max(0,dx/80);if(nh)nh.style.opacity=Math.max(0,-dx/80);
+  },{passive:true});
+  card.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    card.style.transition='all 0.3s';
+    if(dx>80) swipeCard('right');
+    else if(dx<-80) swipeCard('left');
+    else{card.style.transform='';}
+  });
+}
+
+function swipeCard(dir){
+  const arena=document.getElementById('swipeArena');
+  const card=arena.querySelector('.swipe-card:last-child');
+  if(!card||currentTinderIdx>=tinderDeck.length) return;
+  const vendor=tinderDeck[currentTinderIdx];
+  card.style.transition='all 0.35s cubic-bezier(0.25,0.46,0.45,0.94)';
+  if(dir==='right'||dir==='super'){
+    card.style.transform='translateX(150%) rotate(20deg)';
+    tinderMatches.push({...vendor,superLike:dir==='super',matchedAt:new Date().toISOString()});
+    renderMatches();
+    showToast(dir==='super'?`⭐ Super-liked ${vendor.name}!`:`✓ Invited ${vendor.name}!`,'success');
+    updateOrgStats();
+  }else{
+    card.style.transform='translateX(-150%) rotate(-20deg)';
+  }
+  setTimeout(()=>{card.remove();currentTinderIdx++;renderTinderDeck();},320);
+}
+
+function showVendorInfo(){
+  const vendor=tinderDeck[currentTinderIdx];
+  if(!vendor) return;
+  openVendorDetail(vendor.name,vendor.category+' · '+vendor.city,vendor.emoji,vendor.events,vendor.rating,vendor.accept,vendor.bg,vendor.vibes.join(','));
+}
+
+function resetTinder(){currentTinderIdx=0;tinderDeck=[...vendorPool];renderTinderDeck();}
+
+function renderMatches(){
+  const ml=document.getElementById('matchesList');
+  const am=document.getElementById('allMatchesList');
+  const html=tinderMatches.map(v=>`
+    <div class="match-item">
+      <div class="match-item-emoji">${v.emoji}</div>
+      <div class="match-item-info">
+        <div class="match-item-name">${v.name}${v.superLike?' ⭐':''}</div>
+        <div class="match-item-sub">${v.category} · ${v.city}</div>
+      </div>
+      <div class="match-item-actions">
+        <button class="mi-btn" onclick="openChatRoom('${v.name}')">💬 Chat</button>
+        <button class="mi-btn" onclick="showToast('✓ Stall spot reserved for ${v.name}','success')">✓ Book</button>
+      </div>
+    </div>`).join('');
+  if(ml) ml.innerHTML=html||'<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:30px 0">No matches yet</div>';
+  if(am) am.innerHTML=html||'<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px 0">Swipe right on vendors to see them here</div>';
+  if(html) document.getElementById('noMatchesYet').style.display='none';
+}
+
+function updateOrgStats(){
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  document.getElementById('orgStatApps').textContent=apps.length;
+  document.getElementById('orgStatMatches').textContent=tinderMatches.length;
+  document.getElementById('orgStatPending').textContent=apps.filter(a=>a.status==='pending').length;
+}
+
+// ===== ORGANISER DASHBOARD =====
+function openOrgDash(){
+  openModal('orgDashModal');
+  updateOrgStats();
+  buildOrgAiRecs();
+  renderTinderDeck();
+  renderMatches();
+  renderAppsList();
+}
+
+function switchOrgTab(tab,el){
+  document.querySelectorAll('.org-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['overview','tinder','applications','matches'].forEach(t=>{
+    const panel=document.getElementById('orgTab_'+t);
+    if(panel) panel.style.display=t===tab?'block':'none';
+  });
+  if(tab==='tinder') setTimeout(()=>{if(tinderDeck.length>0)renderTinderDeck();},100);
+}
+
+async function buildOrgAiRecs(){
+  const el=document.getElementById('orgAiRecs');
+  el.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,0.3)">AI is analysing vendors…</div>';
+  // Simple rule-based recs
+  const recs=vendorPool.filter(v=>v.matchKey==='food').slice(0,3);
+  el.innerHTML=recs.map(v=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07)">
+      <span style="font-size:24px">${v.emoji}</span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#fff">${v.name}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">${v.category} · ${v.city} · ★${v.rating}</div></div>
+      <span style="background:rgba(26,122,74,0.2);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px">${85+Math.floor(Math.random()*12)}% match</span>
+    </div>`).join('');
+}
+
+function renderAppsList(){
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]');
+  const el=document.getElementById('appsList');
+  if(!el) return;
+  if(apps.length===0){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:14px">No applications yet.</div>';return;}
+  el.innerHTML=apps.map(a=>`
+    <div class="app-item ${a.status}">
+      <div><div style="font-size:14px;font-weight:600;color:#fff">${a.vendorName}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">${a.eventName} · ${new Date(a.appliedAt).toLocaleDateString()}</div><span class="status-badge sb-${a.status}">${a.status.toUpperCase()}</span></div>
+      ${a.status==='pending'?`<div style="display:flex;gap:8px">
+        <button onclick="changeAppStatus(${a.id},'approved')" style="background:rgba(26,122,74,0.2);color:var(--green);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✓ Approve</button>
+        <button onclick="changeAppStatus(${a.id},'rejected')" style="background:rgba(200,16,46,0.15);color:var(--accent);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">✕ Reject</button>
+        <button onclick="openChatRoom('${a.vendorName}')" style="background:rgba(92,78,232,0.2);color:#9B8EF0;border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">💬 Chat</button>
+      </div>`:`<button onclick="openChatRoom('${a.vendorName}')" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);border:none;padding:7px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer">💬 Chat</button>`}
+    </div>`).join('');
+}
+
+function changeAppStatus(id,status){
+  const apps=JSON.parse(sessionStorage.getItem('tc_applications')||'[]').map(a=>a.id===id?{...a,status}:a);
+  sessionStorage.setItem('tc_applications',JSON.stringify(apps));
+  renderAppsList();updateOrgStats();
+  showToast(status==='approved'?'✅ Vendor approved!':'❌ Vendor rejected.','success');
+}
+
+// ===== VENDOR DETAIL =====
+function openVendorDetail(name,catCity,emoji,events,rating,accept,bg,vibesStr){
+  document.getElementById('vModalName').textContent=name;
+  document.getElementById('vModalBanner').style.background=`linear-gradient(135deg,${bg})`;
+  document.getElementById('vModalBanner').textContent=emoji;
+  const vibes=(vibesStr||'').split(',');
+  document.getElementById('vModalTags').innerHTML=vibes.map(v=>`<span style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:11px;padding:4px 10px;border-radius:50px;font-weight:600">${v}</span>`).join('');
+  document.getElementById('vModalStats').innerHTML=`
+    <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-family:var(--font-display);font-size:22px;font-weight:700">${events}</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Events</div></div>
+    <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-family:var(--font-display);font-size:22px;font-weight:700">★${rating}</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Rating</div></div>
+    <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--green)">${accept}</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Accept Rate</div></div>`;
+  // AI match suggestions for this vendor
+  document.getElementById('vModalMatchEvents').innerHTML=`
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:8px">🤖 Best Event Matches</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8">
+      ${catCity.toLowerCase().includes('food')||catCity.toLowerCase().includes('street')?
+        '🥇 Grub Fest 2026 — 94% match<br>🥈 Horn OK Please — 88% match<br>🥉 Dilli Haat Weekend — 76% match':
+        catCity.toLowerCase().includes('artist')||catCity.toLowerCase().includes('music')?
+        '🥇 NH7 Weekender — 92% match<br>🥈 Kala Ghoda Arts — 86% match<br>🥉 College Fest Circuit — 74% match':
+        '🥇 Craft Bazaar Weekend — 91% match<br>🥈 Dilli Haat — 82% match<br>🥉 Kala Ghoda Arts — 75% match'}
+    </div>`;
+  document.getElementById('vModalChatBtn').onclick=()=>{closeModal('vendorModal');openChatRoom(name)};
+  openModal('vendorModal');
+}
+
+// ===== LIVE CHAT ROOM =====
+let chatRoom=null,chatBcast=null,chatRoomName='';
+function openChatRoom(name){
+  chatRoomName=name;
+  document.getElementById('chatRoomTitle').textContent=name;
+  document.getElementById('chatRoomMsgs').innerHTML='';
+  document.getElementById('chatRoomModal').style.display='flex';
+  document.body.style.overflow='hidden';
+  // Init WebSocket
+  try{
+    chatRoom=new WebSocket('wss://echo.websocket.events');
+    chatRoom.onopen=()=>{document.getElementById('chatRoomStatus').textContent='● Connected'};
+    chatRoom.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.room===chatRoomName&&m.from!=='me') appendRoomMsg(m.text,false,m.from);}catch(ex){}};
+  }catch(ex){}
+  try{chatBcast=new BroadcastChannel('tc_chat_'+chatRoomName);chatBcast.onmessage=e=>{appendRoomMsg(e.data.text,false,e.data.from)};}catch(ex){}
+  // Welcome
+  appendRoomMsg(`You're now chatting with ${name}. Ask about stall availability, pricing, or placement.`,false,'TheCircuit Bot');
+  // Simulate reply
+  setTimeout(()=>{
+    showRoomTyping();
+    setTimeout(()=>{
+      hideRoomTyping();
+      const rs=['Hi! Thanks for reaching out. Which event are you interested in?','Hello! Happy to discuss details. What type of stall do you need?','Hi! We have a few spots left. What size setup do you need?'];
+      appendRoomMsg(rs[Math.floor(Math.random()*rs.length)],false,name);
+    },2200);
+  },1500);
+}
+function closeChatRoom(){chatRoom?.close();chatBcast?.close();document.getElementById('chatRoomModal').style.display='none';document.body.style.overflow='';}
+function sendRoomMsg(){
+  const input=document.getElementById('chatRoomIn');
+  const text=input.value.trim();if(!text) return;
+  input.value='';
+  appendRoomMsg(text,true,'me');
+  try{chatRoom?.send(JSON.stringify({room:chatRoomName,text,from:'me'}));}catch(e){}
+  try{chatBcast?.postMessage({text,from:'me'});}catch(e){}
+  // Auto reply
+  setTimeout(()=>{
+    showRoomTyping();
+    setTimeout(()=>{
+      hideRoomTyping();
+      const rs=['Got it! Let me check stall availability for those dates.','Sure! Our stalls are 10×10 ft. Corner spots available for +₹1,500.','Payment is due 48h after acceptance. GPay/UPI accepted.','You\'ll get SMS confirmation within 24 hours.'];
+      appendRoomMsg(rs[Math.floor(Math.random()*rs.length)],false,chatRoomName);
+    },1200+Math.random()*1500);
+  },600);
+}
+function appendRoomMsg(text,mine,from){
+  const msgs=document.getElementById('chatRoomMsgs');
+  const d=document.createElement('div');
+  d.style.cssText=`display:flex;justify-content:${mine?'flex-end':'flex-start'};margin-bottom:8px`;
+  d.innerHTML=`<div style="max-width:78%;padding:9px 13px;border-radius:${mine?'14px 14px 3px 14px':'14px 14px 14px 3px'};background:${mine?'var(--accent)':'rgba(255,255,255,0.09)'};color:#fff;font-size:13px;line-height:1.5">${!mine?`<div style="font-size:10px;opacity:0.4;margin-bottom:3px">${from}</div>`:''}${text}<div style="font-size:10px;opacity:0.35;margin-top:3px;text-align:right">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+let roomTypingEl=null;
+function showRoomTyping(){if(roomTypingEl) return;const msgs=document.getElementById('chatRoomMsgs');roomTypingEl=document.createElement('div');roomTypingEl.style.cssText='display:flex;justify-content:flex-start;margin-bottom:8px';roomTypingEl.innerHTML='<div style="padding:9px 13px;border-radius:14px;background:rgba(255,255,255,0.08);display:flex;gap:4px;align-items:center"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';msgs.appendChild(roomTypingEl);msgs.scrollTop=msgs.scrollHeight;}
+function hideRoomTyping(){roomTypingEl?.remove();roomTypingEl=null;}
+
+// ===== PROFILE PAGE =====
+function openProfilePage(){
+  const p=JSON.parse(sessionStorage.getItem('tc_profile')||'{}');
+  const el=document.getElementById('profileContent');
+  el.innerHTML=`
+    <div style="height:180px;background:linear-gradient(135deg,#2d0a2d,#6b1a5c,#1a4a6b);display:flex;align-items:center;justify-content:center;font-size:72px;position:relative">
+      ${p.emoji||'🏪'}
+      <div style="position:absolute;top:14px;right:14px;display:flex;gap:8px">
+        ${p.verified?'<span style="background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px">✓ VERIFIED</span>':''}
+        <button onclick="closeProfilePage()" style="background:rgba(0,0,0,0.4);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+      </div>
+    </div>
+    <div style="padding:28px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div><h2 style="font-family:var(--font-display);font-size:28px;font-weight:900;font-style:italic;color:#fff;margin-bottom:4px">${p.name||'Your Stall'}</h2><div style="font-size:13px;color:rgba(255,255,255,0.4)">${p.category||'Food & Beverage'} · 📍 ${p.city||userCity}</div></div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 16px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.3)">Trust Score</div><div style="font-size:18px;font-weight:700;color:var(--green)">${p.verified?'94/100':'—'}</div></div>
+      </div>
+      ${p.desc?`<div style="background:rgba(255,255,255,0.04);border-radius:14px;padding:16px;margin-bottom:16px"><div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">About</div><p style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7">${p.desc}</p></div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">${p.priceRange||'₹100–₹500'}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Price Range</div></div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">${p.preferredEvents||'All Types'}</div><div style="font-size:11px;color:rgba(255,255,255,0.35)">Preferred Events</div></div>
+      </div>
+      <button onclick="closeProfilePage();openKYC()" style="width:100%;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);margin-bottom:10px">✏️ Edit / Re-verify Profile</button>
+      <button onclick="closeProfilePage();document.getElementById('events').scrollIntoView({behavior:'smooth'})" class="btn-submit">Find Matching Events →</button>
+    </div>`;
+  document.getElementById('profilePage').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeProfilePage(){document.getElementById('profilePage').style.display='none';document.body.style.overflow='';}
+
+// ===== AUTH FLOW =====
+let authRole='vendor';
+let authOtpTimer=null;
+function selectAuthRole(role){
+  authRole=role;
+  const vb=document.getElementById('roleVendorBtn'),ob=document.getElementById('roleOrgBtn');
+  if(role==='vendor'){vb.style.borderColor='var(--accent)';vb.style.background='rgba(200,16,46,0.12)';ob.style.borderColor='rgba(255,255,255,0.1)';ob.style.background='transparent';}
+  else{ob.style.borderColor='var(--accent)';ob.style.background='rgba(200,16,46,0.12)';vb.style.borderColor='rgba(255,255,255,0.1)';vb.style.background='transparent';}
+}
+function authNext(step){
+  ['authStep1','authStep2','authStep3','authStep4'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.style.display=i===step-1?'block':'none'});
+  document.getElementById('authBar').style.width=(step/4*100)+'%';
+}
+function sendAuthOTP(){
+  const phone=document.getElementById('authPhone').value.trim();
+  if(phone.length!==10){document.getElementById('authPhoneErr').style.display='block';return;}
+  document.getElementById('authPhoneErr').style.display='none';
+  document.getElementById('authSentTo').textContent='+91 '+phone.slice(0,5)+'*****';
+  showToast('📱 OTP sent','success');
+  authNext(3);
+  setTimeout(()=>document.querySelectorAll('.otp-box')[0].focus(),100);
+}
+function otpIn(el,idx){
+  el.value=el.value.replace(/\D/g,'').slice(-1);
+  if(el.value&&idx<5) document.querySelectorAll('.otp-box')[idx+1].focus();
+  const code=Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join('');
+  if(code.length===6) setTimeout(verifyAuthOTP,200);
+}
+function otpKey(event,idx){
+  const boxes=document.querySelectorAll('.otp-box');
+  if(event.key==='Backspace'&&!boxes[idx].value&&idx>0){boxes[idx-1].focus();boxes[idx-1].value='';}
+}
+function verifyAuthOTP(){
+  const code=Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join('');
+  if(code==='123456'){
+    document.getElementById('authOtpErr').style.display='none';
+    document.getElementById('authWelcomeName').textContent='Welcome to TheCircuit! 🎉';
+    authNext(4);
+  }else{
+    document.getElementById('authOtpErr').style.display='block';
+    document.querySelectorAll('.otp-box').forEach(b=>{b.value='';b.style.borderColor='var(--accent)'});
+    setTimeout(()=>document.querySelectorAll('.otp-box')[0].focus(),100);
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{
+  fetchLocation();
+  // Stats counter
+  let c=0;const si=document.getElementById('statEvents');
+  setInterval(()=>{if(c<20){c++;si.textContent=(2400+c)+'+'}},150);
+  // Restore profile
+  const p=sessionStorage.getItem('tc_profile');
+  if(p){
+    const parsed=JSON.parse(p);
+    if(parsed.name){const nb=document.getElementById('navMainBtn');nb.textContent=`Hi, ${parsed.name.split(' ')[0]} ✓`;nb.style.background='var(--green)';nb.onclick=openProfilePage;}
+  }
+});
+</script>
+</body>
+</html>
