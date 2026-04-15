@@ -2886,7 +2886,7 @@
           onclick="kycNext(3)">Continue to Face Verify →</button>
       </div>
 
-      <!-- Step 3: Face Verify — REAL CAMERA + face-api.js + Claude Vision -->
+      <!-- Step 3: Face Verify — REAL CAMERA + face-api.js + Gemini Vision -->
       <div class="kyc-step" id="kycStep3" style="padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
           <div>
@@ -3668,7 +3668,7 @@
       } else fetchNearbyEvents(28.6139, 77.2090);
     }
 
-    // ===== REAL-TIME EVENTS (Overpass + District.in scrape via Claude) =====
+    // ===== REAL-TIME EVENTS (Overpass + District.in scrape via Gemini) =====
     let vendorProfile = JSON.parse(sessionStorage.getItem('tc_profile') || '{}');
     let latestNearbyEvents = [];
     const chatStorageKey = 'tc_chat_threads';
@@ -3954,23 +3954,25 @@
       const grid = document.getElementById('eventGrid');
       grid.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
 
-      // First try to scrape District.in via Claude API
+      // First try to get events via Gemini API
       let districtEvents = [];
       try {
-        const distResp = await fetch('/api/claude', {
+        const distResp = await fetch('/api/gemini', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514', max_tokens: 800,
-            tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-            messages: [{ role: 'user', content: `Search for upcoming events and fests in ${userCity} India on district.in or insider.in or bookmyshow. Find 3-4 real upcoming events with venue and date. Respond ONLY as JSON array with objects having: name, category, venue, dateRange, footfall (estimate), emoji (single emoji). No markdown.` }]
+            model: 'gemini-1.5-flash',
+            payload: {
+              contents: [{ parts: [{ text: `Search for upcoming events and fests in ${userCity} India on district.in or insider.in or bookmyshow. Find 3-4 real upcoming events with venue and date. Respond ONLY as JSON array with objects having: name, category, venue, dateRange, footfall (estimate), emoji (single emoji). No markdown.` }] }],
+              generationConfig: { maxOutputTokens: 800 }
+            }
           })
         });
         const dd = await distResp.json();
-        const textBlocks = dd.content?.filter(b => b.type === 'text') || [];
-        let raw = textBlocks.map(b => b.text).join('').replace(/```json|```/g, '').trim();
+        let raw = dd.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        raw = raw.replace(/```json|```/g, '').trim();
         const match = raw.match(/\[[\s\S]*\]/);
         if (match) districtEvents = JSON.parse(match[0]).slice(0, 3);
-      } catch (e) { console.warn('District scrape failed', e); }
+      } catch (e) { console.warn('Event fetch failed', e); }
 
       // Overpass for real venue discovery
       let overpassVenues = [];
@@ -3989,18 +3991,22 @@
         allEvents.push({ name: ev.name, cat: ev.category || 'Event', date: ev.dateRange || 'Upcoming', venue: ev.venue || userCity, footfall: ev.footfall || '10,000+', cost: '₹5,000', roi: '₹15K–₹40K', emoji: ev.emoji || '🎪', g1: '#1a0a0a', g2: '#4a1a1a', real: true, src: 'District' });
       });
 
-      // Add Overpass venues enriched with AI
+      // Add Overpass venues enriched with Gemini AI
       for (const v of overpassVenues.slice(0, Math.max(0, 3 - allEvents.length))) {
         try {
-          const er = await fetch('/api/claude', {
+          const er = await fetch('/api/gemini', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514', max_tokens: 250,
-              messages: [{ role: 'user', content: `Venue: "${v.tags.name}" near ${userCity} India. Generate a realistic upcoming vendor event. JSON only: {eventName,category,dateRange,footfall,stallCost,roiRange,emoji,gradient:[hex1,hex2],desc}. No markdown.` }]
+              model: 'gemini-1.5-flash',
+              payload: {
+                contents: [{ parts: [{ text: `Venue: "${v.tags.name}" near ${userCity} India. Generate a realistic upcoming vendor event. JSON only: {eventName,category,dateRange,footfall,stallCost,roiRange,emoji,gradient:[hex1,hex2],desc}. No markdown.` }] }],
+                generationConfig: { maxOutputTokens: 250 }
+              }
             })
           });
           const ed = await er.json();
-          let et = ed.content?.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+          let et = ed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          et = et.replace(/```json|```/g, '').trim();
           const ai = JSON.parse(et);
           allEvents.push({ name: ai.eventName, cat: ai.category, date: ai.dateRange, venue: v.tags.name, footfall: ai.footfall, cost: ai.stallCost, roi: ai.roiRange, emoji: ai.emoji, g1: ai.gradient?.[0] || '#1a1a2a', g2: ai.gradient?.[1] || '#2a1a3a', real: true, src: 'Maps' });
         } catch (e) {
@@ -4392,7 +4398,7 @@
     }
 
     // =====================================================================
-    //  FACE VERIFICATION ENGINE — real camera + face-api.js + Claude vision
+    //  FACE VERIFICATION ENGINE — real camera + face-api.js + Gemini vision
     // =====================================================================
 
     const FV = {
@@ -4415,7 +4421,7 @@
       s.id = 'faceApiScript';
       s.src = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
       s.onload = () => fvLoadModels();
-      s.onerror = () => { fvSetStatus('grey', 'Models unavailable — using Claude vision only'); fvEnableBtn(); };
+      s.onerror = () => { fvSetStatus('grey', 'Models unavailable — using Gemini vision only'); fvEnableBtn(); };
       document.head.appendChild(s);
     })();
 
@@ -4433,7 +4439,7 @@
         fvSetStatus('green', 'Models ready · Click to start camera');
         fvEnableBtn();
       } catch (e) {
-        fvSetStatus('amber', 'Models failed · Claude vision will be used');
+        fvSetStatus('amber', 'Models failed · Gemini vision will be used');
         fvEnableBtn();
       }
     }
@@ -4580,7 +4586,7 @@
       document.getElementById('fvCaptureBtn').disabled = true;
       document.getElementById('fvCaptureBtn').textContent = 'Analysing…';
       document.getElementById('fvSpinner').style.display = 'block';
-      let score = 0, method = 'claude';
+      let score = 0, method = 'gemini';
       // Method 1: face-api descriptor
       if (FV.modelsLoaded && FV.aadhaarDescriptor) {
         try {
@@ -4594,33 +4600,37 @@
           }
         } catch (e) { }
       }
-      // Method 2: Claude Vision fallback
+      // Method 2: Gemini Vision fallback
       if (score === 0) {
         const aadhaarB64 = FV.aadhaarImageB64 || kycData._aadhaarImgB64;
         if (aadhaarB64) {
           try {
-            const resp = await fetch('/api/claude', {
+            const resp = await fetch('/api/gemini', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                model: 'claude-sonnet-4-6', max_tokens: 300,
-                messages: [{
-                  role: 'user', content: [
-                    { type: 'image', source: { type: 'base64', media_type: kycData._aadhaarMtype || 'image/jpeg', data: aadhaarB64 } },
-                    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: liveB64 } },
-                    { type: 'text', text: 'Image 1 is an Aadhaar card. Image 2 is a live camera selfie. Compare the faces. Respond ONLY as JSON: {"similarityScore":0-100,"faceFoundInAadhaar":true/false,"faceFoundInLive":true/false,"confidence":"high/medium/low","verdict":"match/no_match/uncertain"}. No markdown.' }
-                  ]
-                }]
+                model: 'gemini-1.5-flash',
+                payload: {
+                  contents: [{
+                    parts: [
+                      { inline_data: { mime_type: kycData._aadhaarMtype || 'image/jpeg', data: aadhaarB64 } },
+                      { inline_data: { mime_type: 'image/jpeg', data: liveB64 } },
+                      { text: 'Image 1 is an Aadhaar card. Image 2 is a live camera selfie. Compare the faces. Respond ONLY as JSON: {"similarityScore":0-100,"faceFoundInAadhaar":true/false,"faceFoundInLive":true/false,"confidence":"high/medium/low","verdict":"match/no_match/uncertain"}. No markdown.' }
+                    ]
+                  }],
+                  generationConfig: { maxOutputTokens: 300 }
+                }
               })
             });
             const d = await resp.json();
-            const txt = d.content?.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+            let txt = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            txt = txt.replace(/```json|```/g, '').trim();
             const r = JSON.parse(txt);
             const rawScore = typeof r.similarityScore === 'number' ? r.similarityScore : 0;
             if (!r.faceFoundInAadhaar || !r.faceFoundInLive) score = 0;
             else if (r.verdict === 'no_match') score = Math.min(rawScore, 30);
             else if (r.verdict === 'uncertain') score = Math.min(rawScore, 60);
             else score = rawScore;
-            method = 'claude';
+            method = 'gemini';
           } catch (e) { score = 0; method = 'error'; }
         } else { score = 0; method = 'no-aadhaar'; }
       }
@@ -4655,7 +4665,7 @@
       scoreEl.textContent = score + '%';
       if (score >= 60) {
         scoreEl.style.color = 'var(--green)'; labelEl.textContent = '✓ Identity Verified'; labelEl.style.color = 'var(--green)';
-        confEl.textContent = `via ${method === 'faceapi' ? 'ML embedding' : 'Claude Vision'} · Liveness: ${livenessScore}%`;
+        confEl.textContent = `via ${method === 'faceapi' ? 'ML embedding' : 'Gemini Vision'} · Liveness: ${livenessScore}%`;
         fvSetStatus('green', `✓ Match: ${score}% — Verified! Click Continue.`);
         kycData.faceVerified = true; kycData.faceMatchScore = score; kycData.faceMethod = method;
         document.getElementById('fvContinueBtn').style.display = 'block';
@@ -4767,7 +4777,7 @@
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
 
-      // Supported types: jpeg, png, gif, webp (Claude 3 specifics)
+      // Supported types: jpeg, png, gif, webp (Gemini specifics)
       const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
       if (file.type && !supportedTypes.includes(file.type)) {
         addKycMsg(`Sorry, the file format ${file.name.split('.').pop()} is not supported by AI analysis yet. Please try a JPG, PNG, or PDF! 📄`, false);
